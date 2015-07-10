@@ -161,4 +161,4 @@ def main (text):
 	else:
 		return "Информация отсутствует"
 
-print main  ("шар ?что иметь ?что цвет ?какой _?")
+print main (sys.argv[1])
