@@ -1,91 +1,139 @@
-#!/usr/bin/python
 # coding: utf8
+"""
+Синтаксический анализатор
+"""
 
-class SyntaxAnalyzer():
-    def __init__(self,text,cursor):
-        class Concept:
-            id = 0
-            name = 0
-            type = 0
-        class Triad:
-            linkage_id = 0
-            linkage_name = ""
-            left_concept = Concept ()
-            right_concept = Concept ()
-        self.word = []
-        self.tokens = []
-        self.triads = []
-        self.major_linkage_id = 0
-        self.text = text
-        self.cursor = cursor
-        self.after_space = False
-        self.after_linkage = False
-        self.left_concept = Concept ()
-        for letter in self.text:
-            if letter == "?" and self.after_space == True:
-                token = ''.join (self.word)
-                self.tokens.append (token)
-                self.word = []
-                self.after_linkage = True
-            self.after_space = False
+from TokenConcept import TokenConcept
+from TokenLinkage import TokenLinkage
+from Token import Token
+from TokenType import TokenType
+from TokenConceptType import TokenConceptType
+from PropositionTree import PropositionTree
+from PropositionTreeNode import PropositionTreeNode
+
+class SyntaxAnalyzer ():
+
+    def __init__ (self, cursor):
+        self.proposition_tree = None
+        self.__cursor = cursor
+        self.__error_text = ""
+
+    def analize (self, text):
+        word = []
+        tokens = []
+        after_space = False
+        after_linkage = False
+
+        # Разбивка на токены
+        for letter in text:
+            if letter == "?" and after_space == True:
+                token = Token ()
+                token.text = ''.join (word)
+                tokens.append (token)
+                word = []
+                after_linkage = True
+            after_space = False
             if letter == " ":
-                self.after_space = True
-                if self.after_linkage == True:
-                    token = ''.join (self.word)
-                    self.tokens.append (token)
-                    self.word = []
+                after_space = True
+                if after_linkage == True:
+                    token = Token ()
+                    token.text = ''.join (word)
+                    tokens.append (token)
+                    word = []
                 else:
-                    self.word.append (letter)
-                self.after_linkage = False
+                    word.append (letter)
+                after_linkage = False
             else:
-                self.word.append (letter)
+                word.append (letter)
 
-        token = ''.join (self.word)
-        if token != "":
-            token = token.replace ('?', '')
-            self.tokens.append (token)
-    # Построение списка триад
-        self.linkage_filled = False
-        self.idx = 1
+        token = Token ()
+        token.text = ''.join (word)
+        if token.text != "":
+            token.text = token.text.replace ('?', '')
+            tokens.append (token)
 
-        for token in self.tokens:
-            if token.find ('?') == 0:
-                triad = Triad ()
-                s = token.replace ('?', '')
+        # Идентификация токенов
+        for token in tokens:
+            if token.text.find ('?') == 0:
+                s = token.text.replace ('?', '')
                 query = "SELECT id FROM qsl_linkage WHERE name = \'" + s + "\';"
-                self.cursor.execute (query)
-                row = cursor.fetchone ()
+                self.__cursor.execute (query)
+                row = self.__cursor.fetchone ()
                 if row != None:
-                    triad.linkage_id = row[0]
-                triad.linkage_name = token
-                triad.left_concept = Concept ()
-                triad.right_concept = Concept ()
-                triad.left_concept.id = self.left_concept.id
-                triad.left_concept.name = self.left_concept.name
-                self.linkage_filled = True
-            else:
-                if self.linkage_filled == True:
-                    self.linkage_filled = False
-                    if token != "_":
-                        query = "SELECT id, type FROM qsl_concept WHERE name = \'" + token + "\';"
-                        self.cursor.execute (query)
-                        row = cursor.fetchone ()
-                        if row != None:
-                            triad.right_concept.id = row[0]
-                            triad.right_concept.type = row[1]
-                        if triad.right_concept.type == 1:
-                            self.major_linkage_id = self.idx
-                            self.idx += 1
-                    triad.right_concept.name = token
-                    self.left_concept.id = triad.right_concept.id
-                    self.left_concept.name = triad.right_concept.name
-                    self.triads.append (triad)
+                    token.type = TokenType.linkage
+                    token.linkage = TokenLinkage ()
+                    token.linkage.id = row[0]
+                    token.linkage.name = s
                 else:
-                    if token != "_":
-                        query = "SELECT id, type FROM qsl_concept WHERE name = \'" + token + "\';"
-                        self.cursor.execute (query)
-                        row = cursor.fetchone ()
-                        if row != None:
-                            self.left_concept.id = row[0]
-                            self.left_concept.type = row[1]
-                    self.left_concept.name = token
+                    self.__error_text = "#102:Неизвестное имя линката '" + token.text + "'"
+                    return False
+            elif token.text.find ('*') == 0:
+                # Модификатор
+                token.type = TokenType.modifier
+            elif token.text == "(":
+                token.type = TokenType.opening_bracket
+            elif token.text == ")":
+                token.type = TokenType.closing_bracket
+            elif token.text == ",":
+                token.type = TokenType.comma
+            elif token.text == "_":
+                token.type = TokenType.underscore
+            else:
+                query = "SELECT id, type FROM qsl_concept WHERE name = \'" + token.text + "\';"
+                self.__cursor.execute (query)
+                row = self.__cursor.fetchone ()
+                if row != None:
+                    token.type = TokenType.concept
+                    token.concept = TokenConcept ()
+                    token.concept.id = row[0]
+                    token.concept.type = row[1]
+                    token.concept.name = token.text
+                else:
+                    self.__error_text = "#103:Неизвестное имя понятия '" + token.text + "'"
+                    return False
+
+        # Поиск главного понятия действия
+        idx = 0
+        node = None
+        for token in tokens:
+            if token.type == TokenType.concept:
+                if token.concept.type == TokenConceptType.action:
+                    self.proposition_tree = PropositionTree ()
+                    node = PropositionTreeNode ()
+                    #node.type = 
+                    node.text = token.text
+                    self.proposition_tree.root_node = node
+                    break
+            idx += 1
+
+        if node == None:
+            self.__error_text = "#101:Понятие действия в суждении не найдено"
+            return False
+
+        # Обработка левой ветки суждения
+        i = idx - 1
+        while i >= 0:
+            parent_node = node
+            node = PropositionTreeNode ()
+            node.parent = parent_node
+            node.text = tokens[i].text
+            #print node.text
+            parent_node.children.append (node)
+            i -= 1
+
+        # Обработка правой ветки суждения
+        i = idx + 1
+        node = self.proposition_tree.root_node
+        while i < len (tokens):
+            parent_node = node
+            node = PropositionTreeNode ()
+            node.parent = parent_node
+            node.text = tokens[i].text
+            #print node.text
+            parent_node.children.append (node)
+            i += 1
+
+        return True
+
+    def get_error_text (self):
+        return self.__error_text

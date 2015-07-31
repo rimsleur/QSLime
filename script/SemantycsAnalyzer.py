@@ -1,9 +1,11 @@
-#!/usr/bin/python
 # coding: utf8
+"""
+Семантический анализатор
+"""
 
-class SemantycsAnalyzer():
+class SemantycsAnalyzer ():
 
-    def __init__(self, triads, cursor, major_linkage_id, idx): 
+    def __init__ (self, triads, cursor, major_linkage_id, idx):
         self.triads = triads
         self.cursor = cursor
         self.major_linkage_id = major_linkage_id
