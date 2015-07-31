@@ -1,6 +1,6 @@
 #! /bin/bash
 
-cd `cat ../path.txt`
+cd `cat ../path`
 ./qlinkage -c 'что'
 ./qlinkage -c 'какой'
 ./qconcept -c 2 'шар'
