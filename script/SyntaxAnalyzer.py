@@ -21,40 +21,45 @@ class SyntaxAnalyzer ():
     def analize (self, text):
         word = []
         tokens = []
-        after_space = False
-        after_linkage = False
+        prev_letter = ""
 
         # Разбивка на токены
         for letter in text:
-            if letter == "?" and after_space == True:
-                token = Token ()
-                token.text = ''.join (word)
-                tokens.append (token)
-                word = []
-                after_linkage = True
-            after_space = False
             if letter == " ":
-                after_space = True
-                if after_linkage == True:
+                if len (word) > 0:
                     token = Token ()
                     token.text = ''.join (word)
                     tokens.append (token)
                     word = []
+            elif letter == "(" or letter == ")" or letter == "." or letter == "," or letter == "_":
+                if len (word) > 0:
+                    token = Token ()
+                    token.text = ''.join (word)
+                    tokens.append (token)
+                    word = []
+                token = Token ()
+                token.text = letter
+                tokens.append (token)
+            elif letter == "?":
+                if len (word) > 0:
+                    token = Token ()
+                    token.text = ''.join (word)
+                    tokens.append (token)
+                    word = []
+                if prev_letter not in [" "]:
+                    token = Token ()
+                    token.text = letter
+                    tokens.append (token)
                 else:
                     word.append (letter)
-                after_linkage = False
             else:
                 word.append (letter)
-
-        token = Token ()
-        token.text = ''.join (word)
-        if token.text != "":
-            token.text = token.text.replace ('?', '')
-            tokens.append (token)
+            prev_letter = letter
 
         # Идентификация токенов
         for token in tokens:
-            if token.text.find ('?') == 0:
+            #print token.text
+            if token.text.find ('?') == 0 and len (token.text) > 1:
                 s = token.text.replace ('?', '')
                 query = "SELECT id FROM qsl_linkage WHERE name = \'" + s + "\';"
                 self.__cursor.execute (query)
@@ -78,6 +83,10 @@ class SyntaxAnalyzer ():
                 token.type = TokenType.comma
             elif token.text == "_":
                 token.type = TokenType.underscore
+            elif token.text == ".":
+                token.type = TokenType.point
+            elif token.text == "?":
+                token.type = TokenType.question_mark
             else:
                 query = "SELECT id, type FROM qsl_concept WHERE name = \'" + token.text + "\';"
                 self.__cursor.execute (query)
@@ -125,12 +134,13 @@ class SyntaxAnalyzer ():
         i = idx + 1
         node = self.proposition_tree.root_node
         while i < len (tokens):
-            parent_node = node
-            node = PropositionTreeNode ()
-            node.parent = parent_node
-            node.text = tokens[i].text
-            #print node.text
-            parent_node.children.append (node)
+            if tokens[i].type != TokenType.point and tokens[i].type != TokenType.question_mark:
+                parent_node = node
+                node = PropositionTreeNode ()
+                node.parent = parent_node
+                node.text = tokens[i].text
+                #print node.text
+                parent_node.children.append (node)
             i += 1
 
         return True

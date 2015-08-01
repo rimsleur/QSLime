@@ -11,3 +11,5 @@ class TokenType ():
     closing_bracket = 5
     comma = 6
     underscore = 7
+    point = 8
+    question_mark = 9
