@@ -10,6 +10,7 @@ from TokenType import TokenType
 from TokenConceptType import TokenConceptType
 from PropositionTree import PropositionTree
 from PropositionTreeNode import PropositionTreeNode
+from PropositionTreeNodeType import PropositionTreeNodeType
 
 class SyntaxAnalyzer ():
 
@@ -46,7 +47,7 @@ class SyntaxAnalyzer ():
                     token.text = ''.join (word)
                     tokens.append (token)
                     word = []
-                if prev_letter not in [" "]:
+                if prev_letter not in [" ", "("]:
                     token = Token ()
                     token.text = letter
                     tokens.append (token)
@@ -133,12 +134,33 @@ class SyntaxAnalyzer ():
         # Обработка правой ветки суждения
         i = idx + 1
         node = self.proposition_tree.root_node
+        inside_brackets = False
+        common_parent = None
         while i < len (tokens):
-            if tokens[i].type != TokenType.point and tokens[i].type != TokenType.question_mark:
+            if tokens[i].type == TokenType.point:
+                pass
+            elif tokens[i].type == TokenType.question_mark:
+                pass
+            elif tokens[i].type == TokenType.opening_bracket:
+                inside_brackets = True
+                if node.type == PropositionTreeNodeType.concept:
+                    common_parent = node
+            elif tokens[i].type == TokenType.closing_bracket:
+                inside_brackets = False
+            elif tokens[i].type == TokenType.comma:
+                if inside_brackets == True:
+                    node = common_parent
+            else:
                 parent_node = node
                 node = PropositionTreeNode ()
                 node.parent = parent_node
                 node.text = tokens[i].text
+                if tokens[i].type == TokenType.concept:
+                    node.type = PropositionTreeNodeType.concept
+                elif tokens[i].type == TokenType.linkage:
+                    node.type = PropositionTreeNodeType.linkage
+                elif tokens[i].type == TokenType.underscore:
+                    node.type = PropositionTreeNodeType.underscore
                 #print node.text
                 parent_node.children.append (node)
             i += 1
