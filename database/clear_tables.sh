@@ -1,0 +1,1 @@
+mysql qslbase --user=qslbase --password=1q2w3e < clear_tables.sql
