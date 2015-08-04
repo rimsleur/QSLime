@@ -3,6 +3,8 @@
 Древовидное представление суждения
 """
 
+from PropositionTreeNodeType import PropositionTreeNodeType
+
 class PropositionTree ():
 
 	def __init__ (self):
@@ -27,7 +29,15 @@ class PropositionTree ():
 		k = 0
 		while node != None:
 			if node.child_index == 0:
-				print "    "*k + node.text
+				if node.type == PropositionTreeNodeType.concept:
+					if node.concept.subroot == True:
+						print "    "*k + "+" + node.text
+					elif node.concept.sublink == True:
+						print "    "*k + "=" + node.text
+					else:
+						print "    "*k + node.text
+				else:
+					print "    "*k + node.text
 
 			if node.child_index < len (node.children):
 				idx = node.child_index

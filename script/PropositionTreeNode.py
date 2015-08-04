@@ -11,3 +11,5 @@ class PropositionTreeNode ():
 		self.children = []
 		self.child_index = 0
 		self.text = ""
+		self.concept = None
+		self.linkage = None

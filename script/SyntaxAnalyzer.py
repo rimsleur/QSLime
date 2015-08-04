@@ -11,6 +11,8 @@ from TokenConceptType import TokenConceptType
 from PropositionTree import PropositionTree
 from PropositionTreeNode import PropositionTreeNode
 from PropositionTreeNodeType import PropositionTreeNodeType
+from TreeNodeConcept import TreeNodeConcept
+from TreeNodeLinkage import TreeNodeLinkage
 
 class SyntaxAnalyzer ():
 
@@ -32,7 +34,12 @@ class SyntaxAnalyzer ():
                     token.text = ''.join (word)
                     tokens.append (token)
                     word = []
-            elif letter == "(" or letter == ")" or letter == "." or letter == "," or letter == "_":
+            elif letter == "(" or \
+                 letter == ")" or \
+                 letter == "." or \
+                 letter == "," or \
+                 letter == "=" or \
+                 letter == "_":
                 if len (word) > 0:
                     token = Token ()
                     token.text = ''.join (word)
@@ -88,6 +95,8 @@ class SyntaxAnalyzer ():
                 token.type = TokenType.point
             elif token.text == "?":
                 token.type = TokenType.question_mark
+            elif token.text == "=":
+                token.type = TokenType.equal_sign
             else:
                 query = "SELECT id, type FROM qsl_concept WHERE name = \'" + token.text + "\';"
                 self.__cursor.execute (query)
@@ -99,41 +108,73 @@ class SyntaxAnalyzer ():
                     token.concept.type = row[1]
                     token.concept.name = token.text
                 else:
-                    self.__error_text = "#103:Неизвестное имя понятия '" + token.text + "'"
-                    return False
+                    if token.text.isdigit ():
+                        token.type = TokenType.number
+                    else:
+                        self.__error_text = "#103:Неизвестное имя понятия '" + token.text + "'"
+                        return False
 
+        node = self.build_tree (tokens)
+        if node != None:
+            self.proposition_tree = PropositionTree ()
+            self.proposition_tree.root_node = node
+        else:
+            return False
+
+        return True
+
+    def build_tree (self, tokens):
         # Поиск главного понятия действия
         idx = 0
         node = None
+        root_node = None
         for token in tokens:
             if token.type == TokenType.concept:
                 if token.concept.type == TokenConceptType.action:
-                    self.proposition_tree = PropositionTree ()
                     node = PropositionTreeNode ()
-                    #node.type = 
                     node.text = token.text
-                    self.proposition_tree.root_node = node
+                    node.type = PropositionTreeNodeType.concept
+                    node.concept = TreeNodeConcept ()
+                    node.concept.id = token.concept.id
+                    node.concept.name = token.concept.name
+                    node.concept.type = token.concept.type
+                    root_node = node
                     break
             idx += 1
 
         if node == None:
             self.__error_text = "#101:Понятие действия в суждении не найдено"
-            return False
+            return None
 
         # Обработка левой ветки суждения
         i = idx - 1
         while i >= 0:
-            parent_node = node
-            node = PropositionTreeNode ()
-            node.parent = parent_node
-            node.text = tokens[i].text
-            #print node.text
-            parent_node.children.append (node)
+            if tokens[i].type == TokenType.equal_sign:
+                if tokens[i+1].type == TokenType.concept:
+                    node.concept.sublink = True
+            else:
+                parent_node = node
+                node = PropositionTreeNode ()
+                node.parent = parent_node
+                node.text = tokens[i].text
+                if tokens[i].type == TokenType.concept:
+                    node.type = PropositionTreeNodeType.concept
+                    node.concept = TreeNodeConcept ()
+                    node.concept.id = tokens[i].concept.id
+                    node.concept.name = tokens[i].concept.name
+                    node.concept.type = tokens[i].concept.type
+                elif tokens[i].type == TokenType.linkage:
+                    node.type = PropositionTreeNodeType.linkage
+                    node.linkage = TreeNodeLinkage ()
+                    node.linkage.id = tokens[i].linkage.id
+                    node.linkage.name = tokens[i].linkage.name
+                #print node.text
+                parent_node.children.append (node)
             i -= 1
 
         # Обработка правой ветки суждения
         i = idx + 1
-        node = self.proposition_tree.root_node
+        node = root_node
         inside_brackets = False
         common_parent = None
         while i < len (tokens):
@@ -145,11 +186,33 @@ class SyntaxAnalyzer ():
                 inside_brackets = True
                 if node.type == PropositionTreeNodeType.concept:
                     common_parent = node
+                elif node.type == PropositionTreeNodeType.linkage:
+                    b = 1
+                    subtree_tokens = []
+                    j = i + 1
+                    while j < len (tokens) and b != 0:
+                        if tokens[j].type == TokenType.opening_bracket:
+                            b += 1
+                        if tokens[j].type == TokenType.closing_bracket:
+                            b -= 1
+                        if b != 0:
+                            subtree_tokens.append (tokens[j])
+                        j += 1
+
+                    subtree_rootnode = self.build_tree (subtree_tokens)
+                    subtree_rootnode.concept.subroot = True
+                    if node != None:
+                        node.children.append (subtree_rootnode)
+                    else:
+                        return None
+                    i = j - 1
             elif tokens[i].type == TokenType.closing_bracket:
                 inside_brackets = False
             elif tokens[i].type == TokenType.comma:
                 if inside_brackets == True:
                     node = common_parent
+            elif tokens[i].type == TokenType.equal_sign:
+                pass
             else:
                 parent_node = node
                 node = PropositionTreeNode ()
@@ -157,15 +220,22 @@ class SyntaxAnalyzer ():
                 node.text = tokens[i].text
                 if tokens[i].type == TokenType.concept:
                     node.type = PropositionTreeNodeType.concept
+                    node.concept = TreeNodeConcept ()
+                    node.concept.id = tokens[i].concept.id
+                    node.concept.name = tokens[i].concept.name
+                    node.concept.type = tokens[i].concept.type
                 elif tokens[i].type == TokenType.linkage:
                     node.type = PropositionTreeNodeType.linkage
+                    node.linkage = TreeNodeLinkage ()
+                    node.linkage.id = tokens[i].linkage.id
+                    node.linkage.name = tokens[i].linkage.name
                 elif tokens[i].type == TokenType.underscore:
                     node.type = PropositionTreeNodeType.underscore
                 #print node.text
                 parent_node.children.append (node)
             i += 1
 
-        return True
+        return root_node
 
     def get_error_text (self):
         return self.__error_text

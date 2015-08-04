@@ -13,3 +13,5 @@ class TokenType ():
     underscore = 7
     point = 8
     question_mark = 9
+    equal_sign = 10
+    number = 11
