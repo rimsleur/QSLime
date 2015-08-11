@@ -6,7 +6,7 @@
 
 import MySQLdb
 import sys
-from SemantycsAnalyzer import SemantycsAnalyzer
+from SemanticAnalyzer import SemanticAnalyzer
 from SyntaxAnalyzer import SyntaxAnalyzer
 
 reload (sys)
@@ -20,16 +20,13 @@ def main (text):
     syntax_analyzer = SyntaxAnalyzer (cursor)
     if syntax_analyzer.analize (text):
         syntax_analyzer.proposition_tree.print_tree ()
+        semantic_analyzer = SemanticAnalyzer (cursor, syntax_analyzer.proposition_tree)
+        if semantic_analyzer.analize ():
+            semantic_analyzer.proposition_tree.print_tree ()
+            return semantic_analyzer.result
+        else:
+            return semantic_analyzer.get_error_text ()
     else:
-        print syntax_analyzer.get_error_text ()
-
-    #triads = synObj.triads
-    #major_linkage_id = synObj.major_linkage_id
-    #idx = synObj.idx
-
-    #semObj = SemantycsAnalyzer(triads, cursor, major_linkage_id, idx)
-
-    #return  semObj.res
-
+        return syntax_analyzer.get_error_text ()
 
 print main(sys.argv[1])

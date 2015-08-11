@@ -25,7 +25,7 @@ class PropositionTree ():
 
 	def print_tree (self):
 		node = self.root_node
-
+		node.child_index = 0
 		k = 0
 		while node != None:
 			if node.child_index == 0:
@@ -44,6 +44,7 @@ class PropositionTree ():
 				node.child_index += 1
 				self.push_node (node)
 				node = node.children[idx]
+				node.child_index = 0
 				k += 1
 			else:
 				node = self.pop_node ()

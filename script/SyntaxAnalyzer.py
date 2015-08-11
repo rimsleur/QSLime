@@ -11,6 +11,7 @@ from TokenConceptType import TokenConceptType
 from PropositionTree import PropositionTree
 from PropositionTreeNode import PropositionTreeNode
 from PropositionTreeNodeType import PropositionTreeNodeType
+from PropositionTreeNodeSide import PropositionTreeNodeSide
 from TreeNodeConcept import TreeNodeConcept
 from TreeNodeLinkage import TreeNodeLinkage
 
@@ -134,6 +135,7 @@ class SyntaxAnalyzer ():
                     node = PropositionTreeNode ()
                     node.text = token.text
                     node.type = PropositionTreeNodeType.concept
+                    node.side = PropositionTreeNodeSide.center
                     node.concept = TreeNodeConcept ()
                     node.concept.id = token.concept.id
                     node.concept.name = token.concept.name
@@ -159,12 +161,14 @@ class SyntaxAnalyzer ():
                 node.text = tokens[i].text
                 if tokens[i].type == TokenType.concept:
                     node.type = PropositionTreeNodeType.concept
+                    node.side = PropositionTreeNodeSide.left
                     node.concept = TreeNodeConcept ()
                     node.concept.id = tokens[i].concept.id
                     node.concept.name = tokens[i].concept.name
                     node.concept.type = tokens[i].concept.type
                 elif tokens[i].type == TokenType.linkage:
                     node.type = PropositionTreeNodeType.linkage
+                    node.side = PropositionTreeNodeSide.left
                     node.linkage = TreeNodeLinkage ()
                     node.linkage.id = tokens[i].linkage.id
                     node.linkage.name = tokens[i].linkage.name
@@ -220,12 +224,14 @@ class SyntaxAnalyzer ():
                 node.text = tokens[i].text
                 if tokens[i].type == TokenType.concept:
                     node.type = PropositionTreeNodeType.concept
+                    node.side = PropositionTreeNodeSide.right
                     node.concept = TreeNodeConcept ()
                     node.concept.id = tokens[i].concept.id
                     node.concept.name = tokens[i].concept.name
                     node.concept.type = tokens[i].concept.type
                 elif tokens[i].type == TokenType.linkage:
                     node.type = PropositionTreeNodeType.linkage
+                    node.side = PropositionTreeNodeSide.right
                     node.linkage = TreeNodeLinkage ()
                     node.linkage.id = tokens[i].linkage.id
                     node.linkage.name = tokens[i].linkage.name
