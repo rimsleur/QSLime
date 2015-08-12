@@ -3,7 +3,7 @@
 Тип понятия в токене
 """
 
-class TokenConceptType ():
+class TreeNodeConceptType ():
     action = 1
     definition = 2
     number = 3

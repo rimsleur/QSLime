@@ -11,25 +11,61 @@ from DatabaseConcept import DatabaseConcept
 from DatabaseTriad import DatabaseTriad
 from DatabaseSequence import DatabaseSequence
 from DatabaseList import DatabaseList
+from TreeNodeConceptType import TreeNodeConceptType
 
 class SemanticAnalyzer ():
 
-    def __init__ (self, cursor, tree):
-        self.proposition_tree = tree
+    def __init__ (self, cursor, code_stack):
         self.result = ""
         self.__cursor = cursor
         self.__error_text = ""
+        self.__code_stack = code_stack
 
-    def analize (self):
+    def analize (self, tree):
+        self.result = ""
+        self.__error_text = ""
+        self.proposition_tree = tree
         print "<SemanticAnalyzer>"
         actor, actant = self.__get_actor_and_actant (self.proposition_tree.root_node)
         if actor == None:
             return False
         if self.proposition_tree.root_node.concept.name == "выполнять":
             if actor.concept.name == "ты":
-                database_list = DatabaseList.read (self.__cursor, actant.concept.id, 0)
-                if database_list != None:
-                    print database_list.id
+                database_concept = DatabaseConcept.read_by_name (self.__cursor, "быть")
+                if database_concept == None:
+                    self.__error_text = "#106:Процедура не содержит программного кода"
+                    return False
+                database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
+                if database_triad == None:
+                    self.__error_text = "#106:Процедура не содержит программного кода"
+                    return None
+                query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                self.__cursor.execute (query)
+                row = self.__cursor.fetchone ()
+                rows = []
+                list_id = 0
+                while (row != None):
+                    rows.append (row[0])
+                    row = self.__cursor.fetchone ()
+                for row in rows:
+                    database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                    if database_triad == None:
+                        continue
+                    database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                    if database_concept == None:
+                        continue
+                    if database_concept.type != TreeNodeConceptType.list:
+                        continue
+                    list_id = database_concept.id
+                if list_id == 0:
+                    self.__error_text = "#106:Процедура не содержит программного кода"
+                    return False
+                database_list = DatabaseList.read (self.__cursor, list_id, 0)
+                if database_list == None:
+                    self.__error_text = "#106:Процедура не содержит программного кода"
+                    return False
+                self.__code_stack.push (database_list)
+                print database_list.text
 
         print "</SemanticAnalyzer>"
         return True
@@ -98,7 +134,7 @@ class SemanticAnalyzer ():
                                     return None
                                 result_node.concept.id = database_triad.left_concept_id
                                 database_concept = DatabaseConcept.read_by_name (self.__cursor, "быть")
-                                if database_triad == None:
+                                if database_concept == None:
                                     self.__error_text = "#104:Понятие не является процедурой"
                                     return None
                                 database_triad1 = DatabaseTriad.read (self.__cursor, result_node.concept.id, 0, database_concept.id)
