@@ -13,9 +13,19 @@ class DatabaseTriad ():
 
 	@classmethod
 	def read (cls, cursor, left_concept_id, linkage_id, right_concept_id):
-		query = "SELECT id, left_concept_id, linkage_id, right_concept_id FROM qsl_triad WHERE left_concept_id = " 
-		query += str (left_concept_id) + " AND linkage_id = " + str (linkage_id)
-		query += " AND right_concept_id = " + str (right_concept_id) + ";"
+		query = "SELECT id, left_concept_id, linkage_id, right_concept_id FROM qsl_triad WHERE"
+		if left_concept_id != 0:
+			query += " left_concept_id = " + str (left_concept_id)
+			if linkage_id != 0 or right_concept_id !=0:
+				query += " AND"
+		if linkage_id != 0:
+			query += " linkage_id = " + str (linkage_id)
+			if right_concept_id !=0:
+				query += " AND"
+		if right_concept_id !=0:
+			query += " right_concept_id = " + str (right_concept_id)
+		query += ";"
+
 		cursor.execute (query)
 		row = cursor.fetchone ()
 		if row != None:

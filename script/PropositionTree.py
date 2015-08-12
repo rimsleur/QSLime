@@ -27,6 +27,7 @@ class PropositionTree ():
 		node = self.root_node
 		node.child_index = 0
 		k = 0
+		print "<Печать древовидной структуры суждения>"
 		while node != None:
 			if node.child_index == 0:
 				if node.type == PropositionTreeNodeType.concept:
@@ -49,3 +50,4 @@ class PropositionTree ():
 			else:
 				node = self.pop_node ()
 				k -= 1
+		print "</Печать древовидной структуры суждения>"

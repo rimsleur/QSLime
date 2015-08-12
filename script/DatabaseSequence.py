@@ -14,7 +14,17 @@ class DatabaseSequence ():
 	@classmethod
 	def read (cls, cursor, proposition_id, left_triad_id, right_triad_id):
 		query = "SELECT id, proposition_id, left_triad_id, right_triad_id FROM qsl_sequence WHERE"
-		query += " right_triad_id = " + str (right_triad_id) + ";"
+		if proposition_id != 0:
+			query += " proposition_id = " + str (proposition_id)
+			if right_triad_id != 0 or left_triad_id !=0:
+				query += " AND"
+		if right_triad_id != 0:
+			query += " right_triad_id = " + str (right_triad_id)
+			if left_triad_id !=0:
+				query += " AND"
+		if left_triad_id != 0:
+			query += " left_triad_id = " + str (left_triad_id)
+		query += ";"
 		cursor.execute (query)
 		row = cursor.fetchone ()
 		if row != None:
