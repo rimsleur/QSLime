@@ -14,6 +14,7 @@ from PropositionTreeNodeType import PropositionTreeNodeType
 from PropositionTreeNodeSide import PropositionTreeNodeSide
 from TreeNodeConcept import TreeNodeConcept
 from TreeNodeLinkage import TreeNodeLinkage
+from ErrorHelper import ErrorHelper
 
 class SyntaxAnalyzer ():
 
@@ -79,7 +80,7 @@ class SyntaxAnalyzer ():
                     token.linkage.id = row[0]
                     token.linkage.name = s
                 else:
-                    self.__error_text = "#102:Неизвестное имя линката '" + token.text + "'"
+                    self.__error_text = ErrorHelper.get_text (self.__cursor, 102, token.text)
                     return False
             elif token.text.find ('*') == 0:
                 # Модификатор
@@ -112,7 +113,7 @@ class SyntaxAnalyzer ():
                     if token.text.isdigit ():
                         token.type = TokenType.number
                     else:
-                        self.__error_text = "#103:Неизвестное имя понятия '" + token.text + "'"
+                        self.__error_text = ErrorHelper.get_text (self.__cursor, 103, token.text)
                         return False
 
         node = self.build_tree (tokens)
@@ -145,7 +146,7 @@ class SyntaxAnalyzer ():
             idx += 1
 
         if node == None:
-            self.__error_text = "#101:Понятие действия в суждении не найдено"
+            self.__error_text = ErrorHelper.get_text (self.__cursor, 101)
             return None
 
         # Обработка левой ветки суждения

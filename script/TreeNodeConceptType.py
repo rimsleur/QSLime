@@ -1,6 +1,6 @@
 # coding: utf8
 """
-Тип понятия в токене
+Тип понятия в узле дерева
 """
 
 class TreeNodeConceptType ():
