@@ -36,11 +36,11 @@ class SemanticAnalyzer ():
             if actor.concept.name == LanguageHelper.translate ("you"):
                 database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("be"))
                 if database_concept == None:
-                    self.__error_text = ErrorHelper.get_text (self.__cursor, 106)
+                    self.__error_text = ErrorHelper.get_text (106)
                     return False
                 database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
                 if database_triad == None:
-                    self.__error_text = ErrorHelper.get_text (self.__cursor, 106)
+                    self.__error_text = ErrorHelper.get_text (106)
                     return None
                 query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
                 self.__cursor.execute (query)
@@ -61,11 +61,11 @@ class SemanticAnalyzer ():
                         continue
                     list_id = database_concept.id
                 if list_id == 0:
-                    self.__error_text = ErrorHelper.get_text (self.__cursor, 106)
+                    self.__error_text = ErrorHelper.get_text (106)
                     return False
                 database_list = DatabaseList.read (self.__cursor, list_id, 0)
                 if database_list == None:
-                    self.__error_text = ErrorHelper.get_text (self.__cursor, 106)
+                    self.__error_text = ErrorHelper.get_text (106)
                     return False
                 self.__code_stack.push (database_list)
                 print database_list.text
@@ -116,44 +116,44 @@ class SemanticAnalyzer ():
                         if child2.type == PropositionTreeNodeType.concept:
                             database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, child1.linkage.id, child2.concept.id)
                             if database_triad == None:
-                                self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
+                                self.__error_text = ErrorHelper.get_text (105)
                                 return None
                             database_sequense1 = DatabaseSequence.read (self.__cursor, 0, 0, database_triad.id)
                             if database_sequense1 == None:
-                                self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
+                                self.__error_text = ErrorHelper.get_text (105)
                                 return None
                             database_triad = DatabaseTriad.read_by_id (self.__cursor, database_sequense1.left_triad_id)
                             if database_triad == None:
-                                self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
+                                self.__error_text = ErrorHelper.get_text (105)
                                 return None
                             if database_triad.left_concept_id == root_node.concept.id:
                                 database_sequense2 = DatabaseSequence.read (self.__cursor, database_sequense1.proposition_id, 0, database_triad.id)
                                 if database_sequense2 == None:
-                                    self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
+                                    self.__error_text = ErrorHelper.get_text (105)
                                     return None
                                 database_triad = DatabaseTriad.read_by_id (self.__cursor, database_sequense2.left_triad_id)
                                 if database_triad == None:
-                                    self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
+                                    self.__error_text = ErrorHelper.get_text (105)
                                     return None
                                 result_node.concept.id = database_triad.left_concept_id
                                 database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("be"))
                                 if database_concept == None:
-                                    self.__error_text = ErrorHelper.get_text (self.__cursor, 104)
+                                    self.__error_text = ErrorHelper.get_text (104)
                                     return None
                                 database_triad1 = DatabaseTriad.read (self.__cursor, result_node.concept.id, 0, database_concept.id)
                                 if database_triad1 == None:
-                                    self.__error_text = ErrorHelper.get_text (self.__cursor, 104)
+                                    self.__error_text = ErrorHelper.get_text (104)
                                     return None
                                 database_triad2 = DatabaseTriad.read (self.__cursor, database_concept.id, 0, actor.concept.id)
                                 if database_triad2 == None:
-                                    self.__error_text = ErrorHelper.get_text (self.__cursor, 104)
+                                    self.__error_text = ErrorHelper.get_text (104)
                                     return None
                                 database_sequense3 = DatabaseSequence.read (self.__cursor, 0, database_triad1.id, database_triad2.id)
                                 if database_sequense3 == None:
-                                    self.__error_text = ErrorHelper.get_text (self.__cursor, 104)
+                                    self.__error_text = ErrorHelper.get_text (104)
                                     return None
                             else:
-                                self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
+                                self.__error_text = ErrorHelper.get_text (105)
                                 return None
 
         if result_node.concept.id != 0:

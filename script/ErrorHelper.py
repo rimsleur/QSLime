@@ -6,10 +6,14 @@
 class ErrorHelper ():
 
 	@classmethod
-	def get_text (cls, cursor, number, *var):
+	def __init__ (cls, cursor):
+		cls.__cursor = cursor
+
+	@classmethod
+	def get_text (cls, number, *var):
 		query = "SELECT text FROM qsl_error WHERE number = " + str (number) + ";"
-		cursor.execute (query)
-		row = cursor.fetchone ()
+		cls.__cursor.execute (query)
+		row = cls.__cursor.fetchone ()
 		if row != None:
 			text = row[0]
 			i = 0
