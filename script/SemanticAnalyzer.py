@@ -13,6 +13,7 @@ from DatabaseSequence import DatabaseSequence
 from DatabaseList import DatabaseList
 from TreeNodeConceptType import TreeNodeConceptType
 from ErrorHelper import ErrorHelper
+from LanguageHelper import LanguageHelper
 
 class SemanticAnalyzer ():
 
@@ -21,6 +22,7 @@ class SemanticAnalyzer ():
         self.__cursor = cursor
         self.__error_text = ""
         self.__code_stack = code_stack
+        LanguageHelper (self.__cursor, "RU")
 
     def analize (self, tree):
         self.result = ""
@@ -30,9 +32,9 @@ class SemanticAnalyzer ():
         actor, actant = self.__get_actor_and_actant (self.proposition_tree.root_node)
         if actor == None:
             return False
-        if self.proposition_tree.root_node.concept.name == "выполнять":
-            if actor.concept.name == "ты":
-                database_concept = DatabaseConcept.read_by_name (self.__cursor, "быть")
+        if self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("execute"):
+            if actor.concept.name == LanguageHelper.translate ("you"):
+                database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("be"))
                 if database_concept == None:
                     self.__error_text = ErrorHelper.get_text (self.__cursor, 106)
                     return False
@@ -81,7 +83,7 @@ class SemanticAnalyzer ():
         while idx < len (root_node.children) or actor == None or actant == None:
             child = root_node.children[idx]
             if child.type == PropositionTreeNodeType.linkage:
-                if child.linkage.name == "кто" or child.linkage.name == "что":
+                if child.linkage.name == LanguageHelper.translate ("who") or child.linkage.name == LanguageHelper.translate ("what"):
                     parent = child
                     child = child.children[0]
                     if child.type == PropositionTreeNodeType.concept:
@@ -105,11 +107,11 @@ class SemanticAnalyzer ():
         result_node.type = PropositionTreeNodeType.concept
         result_node.concept = TreeNodeConcept ()
 
-        if root_node.concept.name == "иметь":
-            if actant.concept.name == "имя":
+        if root_node.concept.name == LanguageHelper.translate ("have"):
+            if actant.concept.name == LanguageHelper.translate ("name"):
                 child1 = actant.children[0]
                 if child1.type == PropositionTreeNodeType.linkage:
-                    if child1.linkage.name == "какое":
+                    if child1.linkage.name == LanguageHelper.translate ("which"):
                         child2 = child1.children[0]
                         if child2.type == PropositionTreeNodeType.concept:
                             database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, child1.linkage.id, child2.concept.id)
@@ -134,7 +136,7 @@ class SemanticAnalyzer ():
                                     self.__error_text = ErrorHelper.get_text (self.__cursor, 105)
                                     return None
                                 result_node.concept.id = database_triad.left_concept_id
-                                database_concept = DatabaseConcept.read_by_name (self.__cursor, "быть")
+                                database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("be"))
                                 if database_concept == None:
                                     self.__error_text = ErrorHelper.get_text (self.__cursor, 104)
                                     return None

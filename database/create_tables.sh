@@ -5,4 +5,5 @@ mysql qslbase --user=qslbase --password=1q2w3e < qsl_sequence.sql
 mysql qslbase --user=qslbase --password=1q2w3e < qsl_proposition.sql
 mysql qslbase --user=qslbase --password=1q2w3e < qsl_list.sql
 mysql qslbase --user=qslbase --password=1q2w3e < qsl_error.sql
+mysql qslbase --user=qslbase --password=1q2w3e < qsl_language.sql
 
