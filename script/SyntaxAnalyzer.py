@@ -22,7 +22,6 @@ class SyntaxAnalyzer ():
         self.proposition_tree = None
         self.__cursor = cursor
         self.__error_text = ""
-        ErrorHelper (self.__cursor)
 
     def analize (self, text):
         word = []
@@ -174,6 +173,10 @@ class SyntaxAnalyzer ():
                     node.linkage = TreeNodeLinkage ()
                     node.linkage.id = tokens[i].linkage.id
                     node.linkage.name = tokens[i].linkage.name
+                elif tokens[i].type == TokenType.underscore:
+                    node.type = PropositionTreeNodeType.underscore
+                elif tokens[i].type == TokenType.number:
+                    node.type = PropositionTreeNodeType.number
                 #print node.text
                 parent_node.children.append (node)
             i -= 1
@@ -239,6 +242,8 @@ class SyntaxAnalyzer ():
                     node.linkage.name = tokens[i].linkage.name
                 elif tokens[i].type == TokenType.underscore:
                     node.type = PropositionTreeNodeType.underscore
+                elif tokens[i].type == TokenType.number:
+                    node.type = PropositionTreeNodeType.number
                 #print node.text
                 parent_node.children.append (node)
             i += 1

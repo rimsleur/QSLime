@@ -11,3 +11,4 @@ class TreeNodeConceptType ():
     unnamed = 5
     proposition = 6
     list = 7
+    field = 8
