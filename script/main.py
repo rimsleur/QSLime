@@ -11,6 +11,7 @@ from SemanticAnalyzer import SemanticAnalyzer
 from SyntaxAnalyzer import SyntaxAnalyzer
 from ErrorHelper import ErrorHelper
 from MemoryProvider import MemoryProvider
+from ContextProvider import ContextProvider
 
 reload (sys)
 
@@ -25,6 +26,7 @@ def main (text):
         
     ErrorHelper (cursor)
     MemoryProvider ()
+    ContextProvider ()
 
     #print text
     if syntax_analyzer.analize (text):

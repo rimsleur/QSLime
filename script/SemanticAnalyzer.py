@@ -15,6 +15,7 @@ from TreeNodeConceptType import TreeNodeConceptType
 from ErrorHelper import ErrorHelper
 from LanguageHelper import LanguageHelper
 from MemoryProvider import MemoryProvider
+from ContextProvider import ContextProvider
 
 class SemanticAnalyzer ():
 
@@ -118,7 +119,12 @@ class SemanticAnalyzer ():
                             if child.linkage.name == LanguageHelper.translate ("of-what"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.concept:
-                                    field_id = child.concept.id
+                                    if child.concept.name == LanguageHelper.translate ("field"):
+                                        node = ContextProvider.get_field_node ()
+                                        if node != None:
+                                            field_id = node.concept.id
+                                    else:
+                                        field_id = child.concept.id
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
@@ -137,7 +143,12 @@ class SemanticAnalyzer ():
                             if child.linkage.name == LanguageHelper.translate ("of-what"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.concept:
-                                    field_id = child.concept.id
+                                    if child.concept.name == LanguageHelper.translate ("field"):
+                                        node = ContextProvider.get_field_node ()
+                                        if node != None:
+                                            field_id = node.concept.id
+                                    else:
+                                        field_id = child.concept.id
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
@@ -167,7 +178,12 @@ class SemanticAnalyzer ():
                             if child.linkage.name == LanguageHelper.translate ("of-what"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.concept:
-                                    field_id = child.concept.id
+                                    if child.concept.name == LanguageHelper.translate ("field"):
+                                        node = ContextProvider.get_field_node ()
+                                        if node != None:
+                                            field_id = node.concept.id
+                                    else:
+                                        field_id = child.concept.id
                                     self.result += str (MemoryProvider.get_field_value (field_id))
                         i += 1
 
@@ -181,7 +197,7 @@ class SemanticAnalyzer ():
         idx = 0
         actor = None
         actant = None
-        while idx < len (root_node.children) or actor == None or actant == None:
+        while idx < len (root_node.children):
             child = root_node.children[idx]
             if child.type == PropositionTreeNodeType.linkage:
                 if child.linkage.name == LanguageHelper.translate ("who") or child.linkage.name == LanguageHelper.translate ("what"):
@@ -190,9 +206,15 @@ class SemanticAnalyzer ():
                     if child.type == PropositionTreeNodeType.concept:
                         if child.side == PropositionTreeNodeSide.left:
                             actor = child
+                            if root_node.concept.subroot != True:
+                                ContextProvider.set_actor_node (actor)
                         elif child.side == PropositionTreeNodeSide.right:
                             actant = child
+            if actor != None and actant != None:
+                break
             idx += 1
+        if actor == None:
+            actor = ContextProvider.get_actor_node ()
         return actor, actant
 
     def __replace_subtree (self, root_node, side, is_new):
@@ -217,6 +239,7 @@ class SemanticAnalyzer ():
                                     result_node.concept.type = TreeNodeConceptType.field
                                     result_node.concept.name = "$" + str (result_node.concept.id)
                                     result_node.text = result_node.concept.name
+                                    ContextProvider.set_field_node (result_node)
                                 else:
                                     result_node.concept.id = MemoryProvider.get_field_id (child2.concept.name)
                                     is_field = True
