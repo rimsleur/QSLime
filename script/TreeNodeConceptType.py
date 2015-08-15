@@ -12,3 +12,4 @@ class TreeNodeConceptType ():
     proposition = 6
     list = 7
     field = 8
+    event = 9

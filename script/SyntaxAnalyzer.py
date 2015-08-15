@@ -29,7 +29,9 @@ class SyntaxAnalyzer ():
         prev_letter = ""
 
         # Разбивка на токены
-        for letter in text:
+        i = 0
+        while i < len (text):
+            letter = text[i]
             if letter == " ":
                 if len (word) > 0:
                     token = Token ()
@@ -62,13 +64,30 @@ class SyntaxAnalyzer ():
                     tokens.append (token)
                 else:
                     word.append (letter)
+            elif letter == "\"":
+                i += 1
+                while i < len (text):
+                    letter = text[i]
+                    if letter == "\"":
+                        break
+                    else:
+                        word.append (letter)
+                    i += 1
+                token = Token ()
+                token.text = ''.join (word)
+                token.type = TokenType.string
+                tokens.append (token)
+                word = []
             else:
                 word.append (letter)
             prev_letter = letter
+            i += 1
 
         # Идентификация токенов
         for token in tokens:
             #print token.text
+            if token.type == TokenType.string:
+                continue
             if token.text.find ('?') == 0 and len (token.text) > 1:
                 s = token.text.replace ('?', '')
                 query = "SELECT id FROM qsl_linkage WHERE name = \'" + s + "\';"
@@ -177,6 +196,8 @@ class SyntaxAnalyzer ():
                     node.type = PropositionTreeNodeType.underscore
                 elif tokens[i].type == TokenType.number:
                     node.type = PropositionTreeNodeType.number
+                elif tokens[i].type == TokenType.string:
+                    node.type = PropositionTreeNodeType.string
                 #print node.text
                 parent_node.children.append (node)
             i -= 1
@@ -244,6 +265,8 @@ class SyntaxAnalyzer ():
                     node.type = PropositionTreeNodeType.underscore
                 elif tokens[i].type == TokenType.number:
                     node.type = PropositionTreeNodeType.number
+                elif tokens[i].type == TokenType.string:
+                    node.type = PropositionTreeNodeType.string
                 #print node.text
                 parent_node.children.append (node)
             i += 1

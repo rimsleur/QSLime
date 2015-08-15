@@ -9,6 +9,7 @@ class ContextProvider ():
 	def __init__ (cls):
 		cls.__field_node = None
 		cls.__actor_node = None
+		cls.__event_node = None
 
 	@classmethod
 	def set_field_node (cls, node):
@@ -25,3 +26,11 @@ class ContextProvider ():
 	@classmethod
 	def get_actor_node (cls):
 		return cls.__actor_node
+
+	@classmethod
+	def set_event_node (cls, node):
+		cls.__event_node = node
+
+	@classmethod
+	def get_event_node (cls):
+		return cls.__event_node

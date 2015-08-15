@@ -15,3 +15,4 @@ class TokenType ():
     question_mark = 9
     equal_sign = 10
     number = 11
+    string = 12
