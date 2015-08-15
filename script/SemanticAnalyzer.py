@@ -207,6 +207,8 @@ class SemanticAnalyzer ():
                                     if child.type == PropositionTreeNodeType.number:
                                         field_value += int (child.text)
                                         MemoryProvider.set_field_value (field_id, field_value)
+                                        event_key = str (field_id)
+                                        EventProvider.fire_event (event_key)
                             i += 1
         elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-print"):
             if actor.concept.name == LanguageHelper.translate ("you"):
