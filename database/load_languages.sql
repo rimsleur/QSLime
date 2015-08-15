@@ -21,4 +21,5 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('to-register', 'RU', 'регистрировать'),
 ('event', 'RU', 'событие'),
 ('change', 'RU', 'изменение'),
-('handler', 'RU', 'обработчик');
+('handler', 'RU', 'обработчик'),
+('to-delete', 'RU', 'удалять');

@@ -21,10 +21,17 @@ class EventProvider ():
 	def register_event (cls, field_id, key):
 		event = Event ()
 		event.field_id = field_id
+		event.key = key
 		cls.__events.append (event)
 		cls.__last_event_index += 1
 		cls.__event_dict[key] = cls.__last_event_index
 		return cls.__last_event_index
+
+	@classmethod
+	def delete_event (cls, key):
+		id = cls.__event_dict[key]
+		cls.__events[id] = None
+		del (cls.__event_dict[key])
 
 	@classmethod
 	def set_event_handler (cls, id, handler):
