@@ -42,7 +42,7 @@ def main (text):
 
     code_line = CodeStack.pop ()
     while (code_line != None):
-        print code_line.text
+        #print code_line.text
         if syntax_analyzer.analize (code_line.text):
             #syntax_analyzer.proposition_tree.print_tree ()
             if semantic_analyzer.analize (syntax_analyzer.proposition_tree, code_line):

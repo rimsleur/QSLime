@@ -149,6 +149,8 @@ class SemanticAnalyzer ():
                         MemoryProvider.set_field_value (field_id, field_value)
                         event_key = str (field_id)
                         EventProvider.fire_event (event_key)
+                        event_key = str (field_id) + "." + str (field_value)
+                        EventProvider.fire_event (event_key)
                 elif actant.concept.name == LanguageHelper.translate ("handler"):
                     event_id = 0
                     event_handler = None
@@ -209,6 +211,8 @@ class SemanticAnalyzer ():
                                         MemoryProvider.set_field_value (field_id, field_value)
                                         event_key = str (field_id)
                                         EventProvider.fire_event (event_key)
+                                        event_key = str (field_id) + "." + str (field_value)
+                                        EventProvider.fire_event (event_key)
                             i += 1
         elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-print"):
             if actor.concept.name == LanguageHelper.translate ("you"):
@@ -234,6 +238,7 @@ class SemanticAnalyzer ():
                 if actant.concept.name == LanguageHelper.translate ("event"):
                     field_id = 0
                     event_type = 0
+                    field_value = ""
                     i = 0
                     while i < len (actant.children):
                         child = actant.children[i]
@@ -254,11 +259,20 @@ class SemanticAnalyzer ():
                                         event_type = EventType.on_change
                                     elif child.concept.name == LanguageHelper.translate ("value"):
                                         event_type = EventType.on_value
+                                        child = child.children[0]
+                                        if child.type == PropositionTreeNodeType.linkage:
+                                            if child.linkage.name == LanguageHelper.translate ("which"):
+                                                child = child.children[0]
+                                                if child.type == PropositionTreeNodeType.number:
+                                                    field_value = child.text
                         i += 1
                     event_key = None
                     if event_type == EventType.on_change:
                         if field_id != 0:
                             event_key = str (field_id)
+                    elif event_type == EventType.on_value:
+                        if field_id != 0:
+                            event_key = str (field_id) + "." + field_value
                     if event_key != None:
                         node = PropositionTreeNode ()
                         node.type = PropositionTreeNodeType.concept
