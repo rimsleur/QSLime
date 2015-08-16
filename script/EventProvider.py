@@ -83,10 +83,11 @@ class EventProvider ():
 		if len (fired_events) > 0:
 			event = fired_events.pop ()
 		while event != None:
-			code_line = CodeLine ()
-			code_line.field_id = event.field_id
-			code_line.text = event.handler
-			CodeStack.push (code_line)
+			if event.handler != "":
+				code_line = CodeLine ()
+				code_line.field_id = event.field_id
+				code_line.text = event.handler
+				CodeStack.push (code_line)
 			event = None
 			if len (fired_events) > 0:
 				event = fired_events.pop ()

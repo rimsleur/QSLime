@@ -67,8 +67,9 @@ class SyntaxAnalyzer ():
             elif letter == "\"":
                 i += 1
                 while i < len (text):
+                    prev_letter = letter
                     letter = text[i]
-                    if letter == "\"":
+                    if letter == "\"" and prev_letter != "\\":
                         break
                     else:
                         word.append (letter)
