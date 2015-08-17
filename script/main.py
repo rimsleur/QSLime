@@ -13,6 +13,7 @@ from ErrorHelper import ErrorHelper
 from MemoryProvider import MemoryProvider
 from ContextProvider import ContextProvider
 from EventProvider import EventProvider
+from ConditionProvider import ConditionProvider
 
 reload (sys)
 
@@ -28,6 +29,7 @@ def main (text):
     MemoryProvider ()
     ContextProvider ()
     EventProvider ()
+    ConditionProvider ()
 
     #print text
     if syntax_analyzer.analize (text):
@@ -42,7 +44,7 @@ def main (text):
 
     code_line = CodeStack.pop ()
     while (code_line != None):
-        print code_line.text
+        #print code_line.text
         if syntax_analyzer.analize (code_line.text):
             #syntax_analyzer.proposition_tree.print_tree ()
             if semantic_analyzer.analize (syntax_analyzer.proposition_tree, code_line):
@@ -52,6 +54,7 @@ def main (text):
                 return semantic_analyzer.get_error_text ()
         else:
             return syntax_analyzer.get_error_text ()
+        ConditionProvider.dispatch_conditions ()
         EventProvider.dispatch_events ()
         code_line = CodeStack.pop ()
     return result

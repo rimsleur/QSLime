@@ -13,3 +13,4 @@ class TreeNodeConceptType ():
     list = 7
     field = 8
     event = 9
+    condition = 10

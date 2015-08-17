@@ -6,6 +6,7 @@
 from Event import Event
 from CodeStack import CodeStack
 from CodeLine import CodeLine
+from ConditionProvider import ConditionProvider
 
 class EventProvider ():
 
@@ -37,11 +38,11 @@ class EventProvider ():
 		del (cls.__event_keys[key])
 
 	@classmethod
-	def set_event_handler (cls, id, handler):
+	def set_handler (cls, id, handler):
 		cls.__events[id].handler = handler
 
 	@classmethod
-	def get_event_handler (cls, id):
+	def get_handler (cls, id):
 		return cls.__events[id].handler
 
 	@classmethod
@@ -66,6 +67,7 @@ class EventProvider ():
 				else:
 					cls.__fired_events1.append (cls.__events[id])
 					cls.__fired_event_keys1[key] = id
+			ConditionProvider.set_event (id)
 
 	@classmethod
 	def dispatch_events (cls):
