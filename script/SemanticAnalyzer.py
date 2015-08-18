@@ -160,6 +160,10 @@ class SemanticAnalyzer ():
                                     field_value = int (child.text)
                         i += 1
                     if field_id != 0 and field_value != None:
+                        old_value = MemoryProvider.get_field_value (field_id)
+                        if field_value != old_value:
+                            event_key = str (field_id) + "." + str (old_value)
+                            ConditionProvider.unset_event (EventProvider.get_event_id (event_key))
                         MemoryProvider.set_field_value (field_id, field_value)
                         event_key = str (field_id)
                         EventProvider.fire_event (event_key)
