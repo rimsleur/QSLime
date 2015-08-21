@@ -10,4 +10,4 @@ class TokenConceptType ():
     measure = 4
     unnamed = 5
     proposition = 6
-    list = 7
+    dblist = 7

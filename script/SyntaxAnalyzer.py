@@ -22,6 +22,8 @@ class SyntaxAnalyzer ():
         self.proposition_tree = None
         self.__cursor = cursor
         self.__error_text = ""
+        self.__common_parent_node = []
+        self.__common_parent_index = 0
 
     def analize (self, text):
         word = []
@@ -206,7 +208,7 @@ class SyntaxAnalyzer ():
         # Обработка правой ветки суждения
         i = idx + 1
         node = root_node
-        inside_brackets = False
+        level_inside_brackets = 0
         common_parent = None
         while i < len (tokens):
             if tokens[i].type == TokenType.point:
@@ -214,8 +216,10 @@ class SyntaxAnalyzer ():
             elif tokens[i].type == TokenType.question_mark:
                 pass
             elif tokens[i].type == TokenType.opening_bracket:
-                inside_brackets = True
+                level_inside_brackets += 1
                 if node.type == PropositionTreeNodeType.concept:
+                    if level_inside_brackets > 1:
+                        self.__push_common_parent (common_parent)
                     common_parent = node
                 elif node.type == PropositionTreeNodeType.linkage:
                     b = 1
@@ -238,9 +242,10 @@ class SyntaxAnalyzer ():
                         return None
                     i = j - 1
             elif tokens[i].type == TokenType.closing_bracket:
-                inside_brackets = False
+                level_inside_brackets -= 1
+                common_parent = self.__pop_common_parent ()
             elif tokens[i].type == TokenType.comma:
-                if inside_brackets == True:
+                if level_inside_brackets > 0:
                     node = common_parent
             elif tokens[i].type == TokenType.equal_sign:
                 pass
@@ -276,3 +281,14 @@ class SyntaxAnalyzer ():
 
     def get_error_text (self):
         return self.__error_text
+
+    def __push_common_parent (self, node):
+        self.__common_parent_node.append (node)
+        self.__common_parent_index += 1
+
+    def __pop_common_parent (self):
+        if self.__common_parent_index > 0:
+            self.__common_parent_index -= 1
+            return self.__common_parent_node.pop ()
+        else:
+            return None

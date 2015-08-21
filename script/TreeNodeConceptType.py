@@ -10,7 +10,9 @@ class TreeNodeConceptType ():
     measure = 4
     unnamed = 5
     proposition = 6
-    list = 7
+    dblist = 7
     field = 8
     event = 9
     condition = 10
+    memlist = 11
+    element = 12

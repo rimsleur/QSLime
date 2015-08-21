@@ -60,7 +60,14 @@ class SemanticAnalyzer ():
             if node.child_index == 0:
                 if node.type == PropositionTreeNodeType.concept:
                     if node.concept.subroot == True:
-                        child = self.__replace_subtree (node, side, is_new)
+                        child = None
+                        if is_new == True:
+                            if k == 2:
+                                child = self.__replace_subtree (node, side, is_new)
+                            else:
+                                child = self.__replace_subtree (node, side, False)
+                        else:
+                            child = self.__replace_subtree (node, side, is_new)
                         if child != None:
                             parent.children[0] = child
                 else:
@@ -94,6 +101,66 @@ class SemanticAnalyzer ():
                     node.concept.name = "$" + str (node.concept.id)
                     node.text = node.concept.name
                     ContextProvider.set_condition_node (node)
+                elif actant.concept.name == LanguageHelper.translate ("list"):
+                    node = PropositionTreeNode ()
+                    node.type = PropositionTreeNodeType.concept
+                    node.side = actant.side
+                    node.concept = TreeNodeConcept ()
+                    node.concept.id = MemoryProvider.create_list ("")
+                    node.concept.type = TreeNodeConceptType.memlist
+                    node.concept.name = "$" + str (node.concept.id)
+                    node.text = node.concept.name
+                    ContextProvider.set_list_node (node)
+                elif actant.concept.name == LanguageHelper.translate ("reference"):
+                    list_id = 0
+                    ref_list_id = 0
+                    element_id = 0
+                    i = 0
+                    while i < len (actant.children):
+                        child = actant.children[i]
+                        if child.type == PropositionTreeNodeType.linkage:
+                            if child.linkage.name == LanguageHelper.translate ("for-what"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.concept:
+                                    if child.concept.name == LanguageHelper.translate ("element"):
+                                        j = 0
+                                        while j < len (child.children):
+                                            child1 = child.children[j]
+                                            if child1.type == PropositionTreeNodeType.linkage:
+                                                if child1.linkage.name == LanguageHelper.translate ("of-what"):
+                                                    child1 = child1.children[0]
+                                                    if child1.type == PropositionTreeNodeType.concept:
+                                                        if child1.concept.name == LanguageHelper.translate ("list"):
+                                                            node = ContextProvider.get_list_node ()
+                                                            if node != None:
+                                                                list_id = node.concept.id
+                                                        else:
+                                                            list_id = child1.concept.id
+                                                elif child1.linkage.name == LanguageHelper.translate ("which"):
+                                                    child1 = child1.children[0]
+                                                    if child1.type == PropositionTreeNodeType.number:
+                                                        element_id = int (child1.text)
+                                            j += 1
+                                        if list_id == 0:
+                                            node = ContextProvider.get_list_node ()
+                                            if node != None:
+                                                list_id = node.concept.id
+                                        if element_id == 0:
+                                            node = ContextProvider.get_element_node ()
+                                            if node != None:
+                                                element_id = node.concept.id
+                            elif child.linkage.name == LanguageHelper.translate ("on-what"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.concept:
+                                    if child.concept.name == LanguageHelper.translate ("list"):
+                                        node = ContextProvider.get_list_node ()
+                                        if node != None:
+                                            ref_list_id = node.concept.id
+                                    else:
+                                        ref_list_id = child.concept.id
+                        i += 1
+                    if list_id != 0 and element_id != 0 and ref_list_id != 0:
+                        MemoryProvider.set_list_element_ref_list (list_id, element_id, ref_list_id)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-execute"):
                 database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
@@ -119,7 +186,7 @@ class SemanticAnalyzer ():
                     database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
                     if database_concept == None:
                         continue
-                    if database_concept.type != TreeNodeConceptType.list:
+                    if database_concept.type != TreeNodeConceptType.dblist:
                         continue
                     list_concept_id = database_concept.id
                 if list_concept_id == 0:
@@ -140,7 +207,9 @@ class SemanticAnalyzer ():
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-set"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
                     field_id = 0
-                    field_value = None
+                    list_id = 0
+                    element_id = 0
+                    new_value = None
                     i = 0
                     while i < len (actant.children):
                         child = actant.children[i]
@@ -152,23 +221,60 @@ class SemanticAnalyzer ():
                                         node = ContextProvider.get_field_node ()
                                         if node != None:
                                             field_id = node.concept.id
+                                    elif child.concept.name == LanguageHelper.translate ("element"):
+                                        j = 0
+                                        while j < len (child.children):
+                                            child1 = child.children[j]
+                                            if child1.type == PropositionTreeNodeType.linkage:
+                                                if child1.linkage.name == LanguageHelper.translate ("of-what"):
+                                                    child1 = child1.children[0]
+                                                    if child1.type == PropositionTreeNodeType.concept:
+                                                        if child1.concept.name == LanguageHelper.translate ("list"):
+                                                            node = ContextProvider.get_list_node ()
+                                                            if node != None:
+                                                                list_id = node.concept.id
+                                                elif child1.linkage.name == LanguageHelper.translate ("which"):
+                                                    child1 = child1.children[0]
+                                                    if child1.type == PropositionTreeNodeType.number:
+                                                        element_id = int (child1.text)
+                                            j += 1
+                                        if list_id == 0:
+                                            node = ContextProvider.get_list_node ()
+                                            if node != None:
+                                                list_id = node.concept.id
+                                        if element_id == 0:
+                                            node = ContextProvider.get_element_node ()
+                                            if node != None:
+                                                element_id = node.concept.id
                                     else:
                                         field_id = child.concept.id
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
-                                    field_value = int (child.text)
+                                    new_value = int (child.text)
                         i += 1
-                    if field_id != 0 and field_value != None:
-                        old_value = MemoryProvider.get_field_value (field_id)
-                        if field_value != old_value:
-                            event_key = str (field_id) + "." + str (old_value)
-                            ConditionProvider.unset_event (EventProvider.get_event_id (event_key))
-                        MemoryProvider.set_field_value (field_id, field_value)
-                        event_key = str (field_id)
-                        EventProvider.fire_event (event_key)
-                        event_key = str (field_id) + "." + str (field_value)
-                        EventProvider.fire_event (event_key)
+                    if field_id != 0:
+                        if new_value != None:
+                            old_value = MemoryProvider.get_field_value (field_id)
+                            if new_value != old_value:
+                                event_key = str (field_id) + "=" + str (old_value)
+                                ConditionProvider.unset_event (EventProvider.get_event_id (event_key))
+                            MemoryProvider.set_field_value (field_id, new_value)
+                            event_key = str (field_id)
+                            EventProvider.fire_event (event_key)
+                            event_key = str (field_id) + "=" + str (new_value)
+                            EventProvider.fire_event (event_key)
+                    elif list_id != 0 and element_id != 0:
+                        if new_value != None:
+                            old_value = MemoryProvider.get_list_element_value (list_id, element_id)
+                            if new_value != old_value:
+                                event_key = str (list_id) + "[" + str (element_id) + "]=" + str (old_value)
+                                ConditionProvider.unset_event (EventProvider.get_event_id (event_key))
+                            MemoryProvider.set_list_element_value (list_id, element_id, new_value)
+                            event_key = str (list_id) + "[" + str (element_id) + "]"
+                            EventProvider.fire_event (event_key)
+                            event_key = str (list_id) + "[" + str (element_id) + "]=" + str (new_value)
+                            EventProvider.fire_event (event_key)
 
                 elif actant.concept.name == LanguageHelper.translate ("handler"):
                     event_id = 0
@@ -205,6 +311,77 @@ class SemanticAnalyzer ():
                             handler_text = handler_text.replace ("\\", "")
                             ConditionProvider.set_handler (condition_id, handler_text)
 
+#11
+            elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-use"):
+                if actant.concept.name == LanguageHelper.translate ("element"):
+                    list_id = 0
+                    element_id = 0
+                    is_ref = False
+                    i = 0
+                    while i < len (actant.children):
+                        child = actant.children[i]
+                        if child.type == PropositionTreeNodeType.linkage:
+                            if child.linkage.name == LanguageHelper.translate ("of-what"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.concept:
+                                    if child.concept.name == LanguageHelper.translate ("list"):
+                                        node = ContextProvider.get_list_node ()
+                                        if node != None:
+                                            list_id = node.concept.id
+                                    else:
+                                        list_id = child.concept.id
+                            elif child.linkage.name == LanguageHelper.translate ("which"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.number:
+                                    element_id = int (child.text)
+                        i += 1
+                    i = 0
+                    while i < len (self.proposition_tree.root_node.children):
+                        child = self.proposition_tree.root_node.children[i]
+                        if child.type == PropositionTreeNodeType.linkage:
+                            if child.linkage.name == LanguageHelper.translate ("as-what"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.concept:
+                                    if child.concept.name == LanguageHelper.translate ("list"):
+                                        is_ref = True
+                                        list_id = MemoryProvider.get_list_element_ref_list (list_id, element_id)
+                        i += 1
+                    if list_id != 0 and element_id != 0:
+                        if is_ref == False:
+                            pass
+                        else:
+                            node = PropositionTreeNode ()
+                            node.type = PropositionTreeNodeType.concept
+                            node.side = actant.side
+                            node.concept = TreeNodeConcept ()
+                            node.concept.id = list_id
+                            node.concept.type = TreeNodeConceptType.memlist
+                            node.concept.name = "$" + str (node.concept.id)
+                            node.text = node.concept.name
+                            ContextProvider.set_list_node (node)
+
+            elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-add"):
+                if actant.concept.name == LanguageHelper.translate ("element"):
+                    child = actant.children[0]
+                    if child.type == PropositionTreeNodeType.linkage:
+                        if child.linkage.name == LanguageHelper.translate ("of-what"):
+                            child = child.children[0]
+                            if child.type == PropositionTreeNodeType.concept:
+                                if child.concept.name == LanguageHelper.translate ("list"):
+                                    node = ContextProvider.get_list_node ()
+                                    if node != None:
+                                        list_id = node.concept.id
+                                        if list_id != 0:
+                                            node = PropositionTreeNode ()
+                                            node.type = PropositionTreeNodeType.concept
+                                            node.side = actant.side
+                                            node.concept = TreeNodeConcept ()
+                                            node.concept.id = MemoryProvider.add_list_element (list_id)
+                                            node.concept.type = TreeNodeConceptType.element
+                                            node.concept.name = "$" + str (node.concept.id)
+                                            node.text = node.concept.name
+                                            ContextProvider.set_element_node (node)
+
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-increase"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
                     field_id = 0
@@ -240,13 +417,15 @@ class SemanticAnalyzer ():
                                         MemoryProvider.set_field_value (field_id, field_value)
                                         event_key = str (field_id)
                                         EventProvider.fire_event (event_key)
-                                        event_key = str (field_id) + "." + str (field_value)
+                                        event_key = str (field_id) + "=" + str (field_value)
                                         EventProvider.fire_event (event_key)
                             i += 1
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-print"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
                     field_id = 0
+                    list_id = 0
+                    element_id = 0
                     i = 0
                     while i < len (actant.children):
                         child = actant.children[i]
@@ -258,9 +437,37 @@ class SemanticAnalyzer ():
                                         node = ContextProvider.get_field_node ()
                                         if node != None:
                                             field_id = node.concept.id
+                                    elif child.concept.name == LanguageHelper.translate ("element"):
+                                        j = 0
+                                        while j < len (child.children):
+                                            child1 = child.children[j]
+                                            if child1.type == PropositionTreeNodeType.linkage:
+                                                if child1.linkage.name == LanguageHelper.translate ("of-what"):
+                                                    child1 = child1.children[0]
+                                                    if child1.type == PropositionTreeNodeType.concept:
+                                                        if child1.concept.name == LanguageHelper.translate ("list"):
+                                                            node = ContextProvider.get_list_node ()
+                                                            if node != None:
+                                                                list_id = node.concept.id
+                                                elif child1.linkage.name == LanguageHelper.translate ("which"):
+                                                    child1 = child1.children[0]
+                                                    if child1.type == PropositionTreeNodeType.number:
+                                                        element_id = int (child1.text)
+                                            j += 1
+                                        if list_id == 0:
+                                            node = ContextProvider.get_list_node ()
+                                            if node != None:
+                                                list_id = node.concept.id
+                                        if element_id == 0:
+                                            node = ContextProvider.get_element_node ()
+                                            if node != None:
+                                                element_id = node.concept.id
                                     else:
                                         field_id = child.concept.id
-                                    self.result += str (MemoryProvider.get_field_value (field_id))
+                                    if field_id != 0:
+                                        self.result += str (MemoryProvider.get_field_value (field_id))
+                                    elif list_id != 0 and element_id != 0:
+                                        self.result += str (MemoryProvider.get_list_element_value (list_id, element_id))
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.string:
@@ -305,7 +512,7 @@ class SemanticAnalyzer ():
                             event_key = str (field_id)
                     elif event_type == EventType.on_value:
                         if field_id != 0:
-                            event_key = str (field_id) + "." + field_value
+                            event_key = str (field_id) + "=" + field_value
                     if event_key != None:
                         node = PropositionTreeNode ()
                         node.type = PropositionTreeNodeType.concept
@@ -353,7 +560,7 @@ class SemanticAnalyzer ():
                             event_key = str (field_id)
                             EventProvider.delete_event (event_key)
                         elif event_type == EventType.on_value:
-                            event_key = str (field_id) + "." + field_value
+                            event_key = str (field_id) + "=" + field_value
                             EventProvider.delete_event (event_key)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-attach"):
@@ -418,7 +625,7 @@ class SemanticAnalyzer ():
         result_node.type = PropositionTreeNodeType.concept
         result_node.side = side
         result_node.concept = TreeNodeConcept ()
-        is_field = False
+        is_memobject = False
 
         if root_node.concept.name == LanguageHelper.translate ("to-have"):
             if actant.concept.name == LanguageHelper.translate ("name"):
@@ -430,18 +637,37 @@ class SemanticAnalyzer ():
                             if child2.type == PropositionTreeNodeType.concept:
                                 if is_new == True:
                                     result_node.concept.id = MemoryProvider.create_field (child2.concept.name)
-                                    is_field = True
+                                    is_memobject = True
                                     result_node.concept.type = TreeNodeConceptType.field
                                     result_node.concept.name = "$" + str (result_node.concept.id)
                                     result_node.text = result_node.concept.name
                                     ContextProvider.set_field_node (result_node)
                                 else:
                                     result_node.concept.id = MemoryProvider.get_field_id (child2.concept.name)
-                                    is_field = True
+                                    is_memobject = True
                                     result_node.concept.type = TreeNodeConceptType.field
                                     result_node.concept.name = "$" + str (result_node.concept.id)
                                     result_node.text = result_node.concept.name
-                else:
+                elif actor.concept.name == LanguageHelper.translate ("list"):
+                    child1 = actant.children[0]
+                    if child1.type == PropositionTreeNodeType.linkage:
+                        if child1.linkage.name == LanguageHelper.translate ("which"):
+                            child2 = child1.children[0]
+                            if child2.type == PropositionTreeNodeType.concept:
+                                if is_new == True:
+                                    result_node.concept.id = MemoryProvider.create_list (child2.concept.name)
+                                    is_memobject = True
+                                    result_node.concept.type = TreeNodeConceptType.memlist
+                                    result_node.concept.name = "$" + str (result_node.concept.id)
+                                    result_node.text = result_node.concept.name
+                                    ContextProvider.set_list_node (result_node)
+                                else:
+                                    result_node.concept.id = MemoryProvider.get_list_id (child2.concept.name)
+                                    is_memobject = True
+                                    result_node.concept.type = TreeNodeConceptType.memlist
+                                    result_node.concept.name = "$" + str (result_node.concept.id)
+                                    result_node.text = result_node.concept.name
+                elif actor.concept.name == LanguageHelper.translate ("procedure"):
                     child1 = actant.children[0]
                     if child1.type == PropositionTreeNodeType.linkage:
                         if child1.linkage.name == LanguageHelper.translate ("which"):
@@ -488,7 +714,7 @@ class SemanticAnalyzer ():
                                 else:
                                     self.__error_text = ErrorHelper.get_text (105)
                                     return None
-        if is_field != True:
+        if is_memobject != True:
             if result_node.concept.id != 0:
                 database_concept = DatabaseConcept.read_by_id (self.__cursor, result_node.concept.id)
                 result_node.concept.type = database_concept.type

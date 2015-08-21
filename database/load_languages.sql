@@ -25,4 +25,11 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('to-delete', 'RU', 'удалять'),
 ('condition', 'RU', 'условие'),
 ('to-attach', 'RU', 'присоединять'),
-('towards-what', 'RU', 'к-чему');
+('towards-what', 'RU', 'к-чему'),
+('procedure', 'RU', 'процедура'),
+('list', 'RU', 'список'),
+('element', 'RU', 'элемент'),
+('to-add', 'RU', 'добавлять'),
+('reference', 'RU', 'ссылка'),
+('to-use', 'RU', 'использовать'),
+('as-what', 'RU', 'как-что');
