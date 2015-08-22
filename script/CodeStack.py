@@ -9,16 +9,25 @@ class CodeStack ():
 	def __init__ (cls):
 		cls.__code_stack = []
 		cls.__stack_index = 0
+		cls.inside_procedure = False
 
 	@classmethod
-	def push (self, line):
-		self.__code_stack.append (line)
-		self.__stack_index += 1
+	def push (cls, line):
+		cls.__code_stack.append (line)
+		cls.__stack_index += 1
+		#print "->", line.text
 
 	@classmethod
-	def pop (self):
-		if self.__stack_index > 0:
-			self.__stack_index -= 1
-			return self.__code_stack.pop ()
+	def pop (cls):
+		if cls.__stack_index > 0:
+			cls.__stack_index -= 1
+			return cls.__code_stack.pop ()
 		else:
 			return None
+
+	@classmethod
+	def is_empty (cls):
+		if cls.__stack_index == 0:
+			return True
+		else:
+			return False

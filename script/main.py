@@ -61,16 +61,19 @@ def main (single_run, text):
                     return semantic_analyzer.get_error_text ()
             else:
                 return syntax_analyzer.get_error_text ()
-            ConditionProvider.dispatch_conditions ()
-            EventProvider.dispatch_events ()
+            if CodeStack.is_empty () == True:
+                if CodeStack.inside_procedure == False:
+                    ConditionProvider.dispatch_conditions ()
+                    EventProvider.dispatch_events ()
             code_line = CodeStack.pop ()
 
-        if single_run == False:
-            if result != "":
+            if result != "" and single_run == False:
+                #print result
                 os.write (pipeout, result)
                 result = ""
                 exit = True
-        else:
+
+        if single_run == True:
             return result
 
     os.close (pipeout)

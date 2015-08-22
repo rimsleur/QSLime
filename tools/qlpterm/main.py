@@ -26,6 +26,7 @@ def main ():
 			break
 		line = line.replace ("\n", "")
 		#print line
+		#time.sleep (1)
 		pos_lbr = line.find ("[")
 		cmd = line[:pos_lbr]
 		if cmd == "INIT":
@@ -51,7 +52,7 @@ def main ():
 				window.addstr (y, x, "*")
 		elif cmd == "REFR":
 			window.refresh ()
-			time.sleep (1)
+			#time.sleep (1)
 		elif cmd == "MOVE":
 			pos_div = line.find (":")
 			xs = line [pos_lbr+1:pos_div]

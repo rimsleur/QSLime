@@ -47,7 +47,9 @@ class SemanticAnalyzer ():
                     code_line.prev_line_id = database_list.prev_line_id
                     code_line.text = database_list.text
                     CodeStack.push (code_line)
-                    #print database_list.text
+                    CodeStack.inside_procedure = True
+                else:
+                    CodeStack.inside_procedure = False
 
         if self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-create"):
             is_new = True
@@ -202,7 +204,7 @@ class SemanticAnalyzer ():
                 code_line.prev_line_id = database_list.prev_line_id
                 code_line.text = database_list.text
                 CodeStack.push (code_line)
-                #print database_list.text
+                CodeStack.inside_procedure = True
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-set"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
@@ -252,6 +254,8 @@ class SemanticAnalyzer ():
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
                                     new_value = int (child.text)
+                                elif child.type == PropositionTreeNodeType.string:
+                                    new_value = child.text
                         i += 1
                     if field_id != 0:
                         if new_value != None:
@@ -304,14 +308,19 @@ class SemanticAnalyzer ():
                         i += 1
                     if event_id != 0:
                         if handler_text != None:
+                            #Это полная хрень. Пересмотреть
                             handler_text = handler_text.replace ("\\", "")
+                            handler_text = handler_text.replace ("<", "\"")
+                            handler_text = handler_text.replace (">", "\"")
                             EventProvider.set_handler (event_id, handler_text)
                     elif condition_id != 0:
                         if handler_text != None:
+                            #Это тоже. Пересмотреть
                             handler_text = handler_text.replace ("\\", "")
+                            handler_text = handler_text.replace ("<", "\"")
+                            handler_text = handler_text.replace (">", "\"")
                             ConditionProvider.set_handler (condition_id, handler_text)
 
-#11
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-use"):
                 if actant.concept.name == LanguageHelper.translate ("element"):
                     list_id = 0
@@ -398,10 +407,10 @@ class SemanticAnalyzer ():
                                             field_id = node.concept.id
                                     else:
                                         field_id = child.concept.id
-                            elif child.linkage.name == LanguageHelper.translate ("which"):
-                                child = child.children[0]
-                                if child.type == PropositionTreeNodeType.number:
-                                    field_value = child.text
+                            #elif child.linkage.name == LanguageHelper.translate ("which"):
+                            #    child = child.children[0]
+                            #    if child.type == PropositionTreeNodeType.number:
+                            #        field_value = child.text
                         i += 1
                     field_value = None
                     if field_id != 0:
