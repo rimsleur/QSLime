@@ -1,0 +1,1 @@
+mysql qslbase --user=qslbase --password=qslbase < clear_system_space.sql

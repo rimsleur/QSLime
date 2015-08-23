@@ -20,7 +20,7 @@ reload (sys)
 
 def main (single_run, text):
     exit = False
-    db = MySQLdb.connect (host="localhost", user="qslbase", passwd="1q2w3e", db="qslbase", charset="utf8")
+    db = MySQLdb.connect (host="localhost", user="qslbase", passwd="qslbase", db="qslbase", charset="utf8")
     cursor = db.cursor ()
     result = ""
     sys.setdefaultencoding ("utf8")

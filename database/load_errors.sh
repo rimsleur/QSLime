@@ -1,1 +1,1 @@
-mysql qslbase --user=qslbase --password=1q2w3e < load_errors.sql
+mysql qslbase --user=qslbase --password=qslbase < load_errors.sql

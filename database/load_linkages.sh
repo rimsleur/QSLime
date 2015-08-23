@@ -1,0 +1,1 @@
+mysql qslbase --user=qslbase --password=qslbase < load_linkages.sql
