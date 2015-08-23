@@ -308,17 +308,11 @@ class SemanticAnalyzer ():
                         i += 1
                     if event_id != 0:
                         if handler_text != None:
-                            #Это полная хрень. Пересмотреть
                             handler_text = handler_text.replace ("\\", "")
-                            handler_text = handler_text.replace ("<", "\"")
-                            handler_text = handler_text.replace (">", "\"")
                             EventProvider.set_handler (event_id, handler_text)
                     elif condition_id != 0:
                         if handler_text != None:
-                            #Это тоже. Пересмотреть
                             handler_text = handler_text.replace ("\\", "")
-                            handler_text = handler_text.replace ("<", "\"")
-                            handler_text = handler_text.replace (">", "\"")
                             ConditionProvider.set_handler (condition_id, handler_text)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-use"):
