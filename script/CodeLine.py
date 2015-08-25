@@ -11,3 +11,4 @@ class CodeLine ():
 	    self.prev_line_id = 0
 	    self.text = ""
 	    self.field_id = 0
+	    self.tree = None

@@ -18,14 +18,16 @@ from ErrorHelper import ErrorHelper
 
 class SyntaxAnalyzer ():
 
-    def __init__ (self, cursor):
-        self.proposition_tree = None
-        self.__cursor = cursor
-        self.__error_text = ""
-        self.__common_parent_node = []
-        self.__common_parent_index = 0
+    @classmethod
+    def __init__ (cls, cursor):
+        cls.proposition_tree = None
+        cls.__cursor = cursor
+        cls.__error_text = ""
+        cls.__common_parent_node = []
+        cls.__common_parent_index = 0
 
-    def analize (self, text):
+    @classmethod
+    def analize (cls, text):
         word = []
         tokens = []
         prev_letter = ""
@@ -94,15 +96,15 @@ class SyntaxAnalyzer ():
             if token.text.find ('?') == 0 and len (token.text) > 1:
                 s = token.text.replace ('?', '')
                 query = "SELECT id FROM qsl_linkage WHERE name = \'" + s + "\';"
-                self.__cursor.execute (query)
-                row = self.__cursor.fetchone ()
+                cls.__cursor.execute (query)
+                row = cls.__cursor.fetchone ()
                 if row != None:
                     token.type = TokenType.linkage
                     token.linkage = TokenLinkage ()
                     token.linkage.id = row[0]
                     token.linkage.name = s
                 else:
-                    self.__error_text = ErrorHelper.get_text (102, token.text)
+                    cls.__error_text = ErrorHelper.get_text (102, token.text)
                     return False
             elif token.text.find ('*') == 0:
                 # Модификатор
@@ -123,8 +125,8 @@ class SyntaxAnalyzer ():
                 token.type = TokenType.equal_sign
             else:
                 query = "SELECT id, type FROM qsl_concept WHERE name = \'" + token.text + "\';"
-                self.__cursor.execute (query)
-                row = self.__cursor.fetchone ()
+                cls.__cursor.execute (query)
+                row = cls.__cursor.fetchone ()
                 if row != None:
                     token.type = TokenType.concept
                     token.concept = TokenConcept ()
@@ -135,19 +137,20 @@ class SyntaxAnalyzer ():
                     if token.text.isdigit ():
                         token.type = TokenType.number
                     else:
-                        self.__error_text = ErrorHelper.get_text (103, token.text)
+                        cls.__error_text = ErrorHelper.get_text (103, token.text)
                         return False
 
-        node = self.build_tree (tokens)
+        node = cls.build_tree (tokens)
         if node != None:
-            self.proposition_tree = PropositionTree ()
-            self.proposition_tree.root_node = node
+            cls.proposition_tree = PropositionTree ()
+            cls.proposition_tree.root_node = node
         else:
             return False
 
         return True
 
-    def build_tree (self, tokens):
+    @classmethod
+    def build_tree (cls, tokens):
         # Поиск главного понятия действия
         idx = 0
         node = None
@@ -168,7 +171,7 @@ class SyntaxAnalyzer ():
             idx += 1
 
         if node == None:
-            self.__error_text = ErrorHelper.get_text (101)
+            cls.__error_text = ErrorHelper.get_text (101)
             return None
 
         # Обработка левой ветки суждения
@@ -219,7 +222,7 @@ class SyntaxAnalyzer ():
                 level_inside_brackets += 1
                 if node.type == PropositionTreeNodeType.concept:
                     if level_inside_brackets > 1:
-                        self.__push_common_parent (common_parent)
+                        cls.__push_common_parent (common_parent)
                     common_parent = node
                 elif node.type == PropositionTreeNodeType.linkage:
                     b = 1
@@ -234,7 +237,7 @@ class SyntaxAnalyzer ():
                             subtree_tokens.append (tokens[j])
                         j += 1
 
-                    subtree_rootnode = self.build_tree (subtree_tokens)
+                    subtree_rootnode = cls.build_tree (subtree_tokens)
                     subtree_rootnode.concept.subroot = True
                     if node != None:
                         node.children.append (subtree_rootnode)
@@ -243,7 +246,7 @@ class SyntaxAnalyzer ():
                     i = j - 1
             elif tokens[i].type == TokenType.closing_bracket:
                 level_inside_brackets -= 1
-                common_parent = self.__pop_common_parent ()
+                common_parent = cls.__pop_common_parent ()
             elif tokens[i].type == TokenType.comma:
                 if level_inside_brackets > 0:
                     node = common_parent
@@ -279,16 +282,19 @@ class SyntaxAnalyzer ():
 
         return root_node
 
-    def get_error_text (self):
-        return self.__error_text
+    @classmethod
+    def get_error_text (cls):
+        return cls.__error_text
 
-    def __push_common_parent (self, node):
-        self.__common_parent_node.append (node)
-        self.__common_parent_index += 1
+    @classmethod
+    def __push_common_parent (cls, node):
+        cls.__common_parent_node.append (node)
+        cls.__common_parent_index += 1
 
-    def __pop_common_parent (self):
-        if self.__common_parent_index > 0:
-            self.__common_parent_index -= 1
-            return self.__common_parent_node.pop ()
+    @classmethod
+    def __pop_common_parent (cls):
+        if cls.__common_parent_index > 0:
+            cls.__common_parent_index -= 1
+            return cls.__common_parent_node.pop ()
         else:
             return None

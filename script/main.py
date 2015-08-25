@@ -15,7 +15,7 @@ from MemoryProvider import MemoryProvider
 from ContextProvider import ContextProvider
 from EventProvider import EventProvider
 from ConditionProvider import ConditionProvider
-
+from CodeProvider import CodeProvider
 reload (sys)
 
 def main (single_run, text):
@@ -24,8 +24,9 @@ def main (single_run, text):
     cursor = db.cursor ()
     result = ""
     sys.setdefaultencoding ("utf8")
-    syntax_analyzer = SyntaxAnalyzer (cursor)
+    SyntaxAnalyzer (cursor)
     semantic_analyzer = SemanticAnalyzer (cursor)
+    CodeProvider (cursor)
     CodeStack ()
     ErrorHelper (cursor)
     MemoryProvider ()
@@ -38,29 +39,39 @@ def main (single_run, text):
         pipeout = os.open("/tmp/qlpterm-tube", os.O_WRONLY)
 
     #print text
-    if syntax_analyzer.analize (text):
+    if SyntaxAnalyzer.analize (text):
         #syntax_analyzer.proposition_tree.print_tree ()
-        if semantic_analyzer.analize (syntax_analyzer.proposition_tree, None):
+        if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
             #semantic_analyzer.proposition_tree.print_tree ()
             result += semantic_analyzer.result
         else:
             return semantic_analyzer.get_error_text ()
     else:
-        return syntax_analyzer.get_error_text ()
+        return SyntaxAnalyzer.get_error_text ()
 
     while (exit != True):
         code_line = CodeStack.pop ()
         while (code_line != None):
             #print code_line.text
-            if syntax_analyzer.analize (code_line.text):
-                #syntax_analyzer.proposition_tree.print_tree ()
-                if semantic_analyzer.analize (syntax_analyzer.proposition_tree, code_line):
-                    #semantic_analyzer.proposition_tree.print_tree ()
+            analized = True
+            if code_line.tree == None:
+                analized = SyntaxAnalyzer.analize (code_line.text)
+                tree = SyntaxAnalyzer.proposition_tree
+            else:
+                tree = code_line.tree
+            if analized:
+                #tree.print_tree ()
+                if semantic_analyzer.analize (tree, code_line):
+                    #tree.print_tree ()
+                    if code_line.tree != None:
+                        if code_line.tree.is_totally_parsed == False:
+                            code_line.tree = semantic_analyzer.proposition_tree
+                            code_line.tree.is_totally_parsed = True
                     result += semantic_analyzer.result
                 else:
                     return semantic_analyzer.get_error_text ()
             else:
-                return syntax_analyzer.get_error_text ()
+                return SyntaxAnalyzer.get_error_text ()
             if CodeStack.is_empty () == True:
                 if CodeStack.inside_procedure == False:
                     ConditionProvider.dispatch_conditions ()

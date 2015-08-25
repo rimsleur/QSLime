@@ -11,6 +11,7 @@ class PropositionTree ():
 		self.root_node = None
 		self.__node_stack = []
 		self.__stack_index = 0
+		self.is_totally_parsed = False
 
 	def push_node (self, node):
 		self.__node_stack.append (node)

@@ -22,6 +22,7 @@ from EventProvider import EventProvider
 from Event import Event
 from EventType import EventType
 from ConditionProvider import ConditionProvider
+from CodeProvider import CodeProvider
 
 class SemanticAnalyzer ():
 
@@ -39,17 +40,23 @@ class SemanticAnalyzer ():
         #print "<SemanticAnalyzer>"
         if code_line != None:
             if code_line.concept_id != 0:
-                database_list = DatabaseList.read (self.__cursor, code_line.concept_id, code_line.id)
-                if database_list != None:
-                    code_line = CodeLine ()
-                    code_line.id = database_list.id
-                    code_line.concept_id = database_list.concept_id
-                    code_line.prev_line_id = database_list.prev_line_id
-                    code_line.text = database_list.text
-                    CodeStack.push (code_line)
-                    CodeStack.inside_procedure = True
+                if code_line.concept_id == CodeProvider.get_initial_procedure ():
+                    database_list = DatabaseList.read (self.__cursor, code_line.concept_id, code_line.id)
+                    if database_list != None:
+                        code_line = CodeLine ()
+                        code_line.id = database_list.id
+                        code_line.concept_id = database_list.concept_id
+                        code_line.prev_line_id = database_list.prev_line_id
+                        code_line.text = database_list.text
+                        CodeStack.push (code_line)
+                        CodeStack.inside_procedure = True
+                    else:
+                        CodeStack.inside_procedure = False
                 else:
-                    CodeStack.inside_procedure = False
+                    if CodeProvider.execute_next_line () == True:
+                        CodeStack.inside_procedure = True
+                    else:
+                        CodeStack.inside_procedure = False
 
         if self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-create"):
             is_new = True
@@ -165,46 +172,85 @@ class SemanticAnalyzer ():
                         MemoryProvider.set_list_element_ref_list (list_id, element_id, ref_list_id)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-execute"):
-                database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
-                if database_concept == None:
-                    self.__error_text = ErrorHelper.get_text (106)
-                    return False
-                database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
-                if database_triad == None:
-                    self.__error_text = ErrorHelper.get_text (106)
-                    return None
-                query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
-                self.__cursor.execute (query)
-                row = self.__cursor.fetchone ()
-                rows = []
-                list_concept_id = 0
-                while (row != None):
-                    rows.append (row[0])
-                    row = self.__cursor.fetchone ()
-                for row in rows:
-                    database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
-                    if database_triad == None:
-                        continue
-                    database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                if code_line == None:
+                    database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
                     if database_concept == None:
-                        continue
-                    if database_concept.type != TreeNodeConceptType.dblist:
-                        continue
-                    list_concept_id = database_concept.id
-                if list_concept_id == 0:
-                    self.__error_text = ErrorHelper.get_text (106)
-                    return False
-                database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
-                if database_list == None:
-                    self.__error_text = ErrorHelper.get_text (106)
-                    return False
-                code_line = CodeLine ()
-                code_line.id = database_list.id
-                code_line.concept_id = database_list.concept_id
-                code_line.prev_line_id = database_list.prev_line_id
-                code_line.text = database_list.text
-                CodeStack.push (code_line)
-                CodeStack.inside_procedure = True
+                        self.__error_text = ErrorHelper.get_text (106)
+                        return False
+                    database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
+                    if database_triad == None:
+                        self.__error_text = ErrorHelper.get_text (106)
+                        return None
+                    query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                    self.__cursor.execute (query)
+                    row = self.__cursor.fetchone ()
+                    rows = []
+                    list_concept_id = 0
+                    while (row != None):
+                        rows.append (row[0])
+                        row = self.__cursor.fetchone ()
+                    for row in rows:
+                        database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                        if database_triad == None:
+                            continue
+                        database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                        if database_concept == None:
+                            continue
+                        if database_concept.type != TreeNodeConceptType.dblist:
+                            continue
+                        list_concept_id = database_concept.id
+                    if list_concept_id == 0:
+                        self.__error_text = ErrorHelper.get_text (106)
+                        return False
+                    database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
+                    if database_list == None:
+                        self.__error_text = ErrorHelper.get_text (106)
+                        return False
+                    code_line = CodeLine ()
+                    code_line.id = database_list.id
+                    code_line.concept_id = database_list.concept_id
+                    code_line.prev_line_id = database_list.prev_line_id
+                    code_line.text = database_list.text
+                    CodeStack.push (code_line)
+                    CodeStack.inside_procedure = True
+                    CodeProvider.set_initial_procedure (database_list.concept_id)
+                else:
+                    if CodeProvider.is_procedure_already_loaded (actant.concept.id) == False:
+                        database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
+                        if database_concept == None:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return False
+                        database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
+                        if database_triad == None:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return None
+                        query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        rows = []
+                        list_concept_id = 0
+                        while (row != None):
+                            rows.append (row[0])
+                            row = self.__cursor.fetchone ()
+                        for row in rows:
+                            database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                            if database_triad == None:
+                                continue
+                            database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                            if database_concept == None:
+                                continue
+                            if database_concept.type != TreeNodeConceptType.dblist:
+                                continue
+                            list_concept_id = database_concept.id
+                        if list_concept_id == 0:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return False
+                        database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
+                        if database_list == None:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return False
+                        CodeProvider.load_procedure (actant.concept.id, database_list.concept_id)
+                    CodeProvider.execute_procedure (actant.concept.id)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-set"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
