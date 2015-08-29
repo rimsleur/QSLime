@@ -14,8 +14,10 @@ class CodeProvider ():
 		cls.__procedures = []
 		cls.__procedures_keys = {}
 		cls.__cursor = cursor
-		cls.__current_procedure = 0
-		cls.__current_line = 0
+		cls.__current_procedure = None
+		cls.__current_line = None
+		cls.__current_procedures = []
+		cls.__current_lines = []
 
 	@classmethod
 	def set_initial_procedure (cls, id):
@@ -55,22 +57,35 @@ class CodeProvider ():
 			#SyntaxAnalyzer.proposition_tree.print_tree ()
 			cls.__procedures[idx].append (code_line)
 			cls.__procedures_keys[concept_id] = idx
-		cls.__current_procedure = 0
-		cls.__current_line = 0
 
 	@classmethod
 	def execute_procedure (cls, concept_id):
 		id = cls.__procedures_keys.get(concept_id)		
 		if id != None:
+			if cls.__current_procedure != None:
+				cls.__current_procedures.append (cls.__current_procedure)
 			cls.__current_procedure = id
+			if cls.__current_line != None:
+				cls.__current_lines.append (cls.__current_line)
 			cls.__current_line = 0
-			cls.execute_next_line ()
+			CodeStack.inside_procedure = True
+			cls.prepare_next_line ()
 
 	@classmethod
-	def execute_next_line (cls):
+	def prepare_next_line (cls):
 		if cls.__current_line < len (cls.__procedures[cls.__current_procedure]):
 			CodeStack.push (cls.__procedures[cls.__current_procedure][cls.__current_line])
 			cls.__current_line += 1
 			return True
 		else:
+			if len (cls.__current_procedures) > 0:
+				cls.__current_procedure = cls.__current_procedures.pop ()
+			else:
+				cls.__current_procedure = None
+			if len (cls.__current_lines) > 0:
+				cls.__current_line = cls.__current_lines.pop ()
+			else:
+				cls.__current_line = None
+			if cls.__current_procedure == None:
+				CodeStack.inside_procedure = False
 			return False

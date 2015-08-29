@@ -31,13 +31,19 @@ class EventProvider ():
 
 	@classmethod
 	def delete_event (cls, key):
-		id = cls.__event_keys[key]
-		cls.__events.pop (id)
-		del (cls.__event_keys[key])
+		id = cls.__event_keys.get (key)
+		#id = cls.__event_keys[key]
+		if id != None:
+			#cls.__events.pop (id)
+			del (cls.__event_keys[key])
 
 	@classmethod
 	def set_handler (cls, id, handler):
 		cls.__events[id].handler = handler
+		#print cls.__events[id].key
+		#Проработать
+		#if cls.__events[id].key == "2":
+		#	cls.__events[id].priority = 2
 
 	@classmethod
 	def get_handler (cls, id):
@@ -63,16 +69,36 @@ class EventProvider ():
 
 	@classmethod
 	def dispatch_events (cls):
+		events = []
 		event = None
 		if len (cls.__fired_events) > 0:
 			event = cls.__fired_events.pop ()
 		while event != None:
 			if event.handler != "":
-				code_line = CodeLine ()
-				code_line.field_id = event.field_id
-				code_line.text = event.handler
-				CodeStack.push (code_line)
+				events.append (event)	
 			event = None
 			if len (cls.__fired_events) > 0:
 				event = cls.__fired_events.pop ()
 		cls.__fired_event_keys.clear ()
+		cls.__sort_events (events)
+		for event in events:
+			code_line = CodeLine ()
+			code_line.field_id = event.field_id
+			code_line.text = event.handler
+			CodeStack.push (code_line)
+
+	@classmethod
+	def __sort_events (cls, events):
+		#for event in events:
+		#	print event.key, event.priority
+		r = len (events) - 1
+		i = 0
+		while i < r:
+			j = r
+			while j > i:
+				if events[j-1].priority < events[j].priority:
+					e = events[j-1]
+					events[j-1] = events[j]
+					events[j] = e
+				j -= 1
+			i += 1

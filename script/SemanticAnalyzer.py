@@ -49,14 +49,11 @@ class SemanticAnalyzer ():
                         code_line.prev_line_id = database_list.prev_line_id
                         code_line.text = database_list.text
                         CodeStack.push (code_line)
-                        CodeStack.inside_procedure = True
+                        #CodeStack.inside_procedure = True
                     else:
                         CodeStack.inside_procedure = False
                 else:
-                    if CodeProvider.execute_next_line () == True:
-                        CodeStack.inside_procedure = True
-                    else:
-                        CodeStack.inside_procedure = False
+                    CodeProvider.prepare_next_line ()
 
         if self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-create"):
             is_new = True

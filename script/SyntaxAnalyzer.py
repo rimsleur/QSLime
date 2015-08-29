@@ -46,7 +46,6 @@ class SyntaxAnalyzer ():
                  letter == ")" or \
                  letter == "." or \
                  letter == "," or \
-                 letter == "=" or \
                  letter == "_":
                 if len (word) > 0:
                     token = Token ()
@@ -56,6 +55,19 @@ class SyntaxAnalyzer ():
                 token = Token ()
                 token.text = letter
                 tokens.append (token)
+            elif letter == "=":
+                if prev_letter == " " or \
+                   prev_letter == "(":
+                    if len (word) > 0:
+                        token = Token ()
+                        token.text = ''.join (word)
+                        tokens.append (token)
+                        word = []
+                    token = Token ()
+                    token.text = letter
+                    tokens.append (token)
+                else:
+                    word.append (letter)
             elif letter == "?":
                 if len (word) > 0:
                     token = Token ()

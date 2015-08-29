@@ -9,3 +9,4 @@ class Event ():
 		self.field_id = 0
 		self.key = ""
 		self.handler = ""
+		self.priority = 1

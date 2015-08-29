@@ -58,6 +58,7 @@ def main ():
 			xs = line [pos_lbr+1:pos_div]
 			pos_rbr = line.find ("]")
 			ys = line [pos_div+1:pos_rbr]
+	time.sleep (1)
 	curses.endwin ()
         
 main ()
