@@ -12,7 +12,7 @@ class TreeNodeConceptType ():
     proposition = 6
     dblist = 7
     field = 8
-    event = 9
+    trigger = 9
     condition = 10
     memlist = 11
     element = 12

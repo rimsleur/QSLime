@@ -20,6 +20,7 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('for-what', 'RU', 'для-чего'),
 ('to-register', 'RU', 'регистрировать'),
 ('event', 'RU', 'событие'),
+('trigger', 'RU', 'триггер'),
 ('change', 'RU', 'изменение'),
 ('handler', 'RU', 'обработчик'),
 ('to-delete', 'RU', 'удалять'),

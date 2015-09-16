@@ -1,8 +1,8 @@
 # coding: utf8
 """
-Тип события
+Тип триггера
 """
 
-class EventType ():
+class TriggerType ():
     on_change = 1
     on_value = 2

@@ -13,7 +13,7 @@ from SyntaxAnalyzer import SyntaxAnalyzer
 from ErrorHelper import ErrorHelper
 from MemoryProvider import MemoryProvider
 from ContextProvider import ContextProvider
-from EventProvider import EventProvider
+from TriggerProvider import TriggerProvider
 from ConditionProvider import ConditionProvider
 from CodeProvider import CodeProvider
 reload (sys)
@@ -31,7 +31,7 @@ def main (single_run, text):
     ErrorHelper (cursor)
     MemoryProvider ()
     ContextProvider ()
-    EventProvider ()
+    TriggerProvider ()
     ConditionProvider ()
 
     if single_run == False:
@@ -75,7 +75,7 @@ def main (single_run, text):
             if CodeStack.is_empty () == True:
                 if CodeStack.inside_procedure == False:
                     ConditionProvider.dispatch_conditions ()
-                    EventProvider.dispatch_events ()
+                    TriggerProvider.dispatch_triggers ()
             code_line = CodeStack.pop ()
 
             if result != "" and single_run == False:

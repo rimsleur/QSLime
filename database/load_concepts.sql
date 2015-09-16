@@ -20,7 +20,7 @@ INSERT INTO `qsl_concept` (`id`, `type`, `name`, `timestamp`) VALUES
 (NULL, 2, 'элемент', NULL),
 (NULL, 2, 'список', NULL),
 (NULL, 2, 'ссылка', NULL),
-(NULL, 2, 'событие', NULL),
+(NULL, 2, 'триггер', NULL),
 (NULL, 2, 'обработчик', NULL),
 (NULL, 2, 'изменение', NULL);
 ALTER TABLE qsl_concept AUTO_INCREMENT=100;

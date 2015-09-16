@@ -1,9 +1,9 @@
 # coding: utf8
 """
-Данные события
+Данные триггера
 """
 
-class Event ():
+class Trigger ():
 
 	def __init__ (self):
 		self.field_id = 0

@@ -9,7 +9,7 @@ class ContextProvider ():
 	def __init__ (cls):
 		cls.__field_node = None
 		cls.__actor_node = None
-		cls.__event_node = None
+		cls.__trigger_node = None
 		cls.__condition_node = None
 		cls.__list_node = None
 		cls.__element_node = None
@@ -31,12 +31,12 @@ class ContextProvider ():
 		return cls.__actor_node
 
 	@classmethod
-	def set_event_node (cls, node):
-		cls.__event_node = node
+	def set_trigger_node (cls, node):
+		cls.__trigger_node = node
 
 	@classmethod
-	def get_event_node (cls):
-		return cls.__event_node
+	def get_trigger_node (cls):
+		return cls.__trigger_node
 
 	@classmethod
 	def set_condition_node (cls, node):
