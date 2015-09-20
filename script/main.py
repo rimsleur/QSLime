@@ -52,7 +52,7 @@ def main (single_run, text):
     while (exit != True):
         code_line = CodeStack.pop ()
         while (code_line != None):
-            #print code_line.text
+            print code_line.text
             analized = True
             if code_line.tree == None:
                 analized = SyntaxAnalyzer.analize (code_line.text)
@@ -74,8 +74,9 @@ def main (single_run, text):
                 return SyntaxAnalyzer.get_error_text ()
             if CodeStack.is_empty () == True:
                 if CodeStack.inside_procedure == False:
-                    ConditionProvider.dispatch_conditions ()
                     TriggerProvider.dispatch_triggers ()
+                    ConditionProvider.dispatch_conditions ()
+                    CodeStack.sort ()
             code_line = CodeStack.pop ()
 
             if result != "" and single_run == False:

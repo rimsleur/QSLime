@@ -14,7 +14,7 @@ class ConditionProvider ():
 		cls.__conditions.append (None)
 		cls.__is_activated_triggers = {}
 		cls.__attach_lists = {}
-		cls.__fired_conditions = []
+		cls.__activated_conditions = []
 
 	@classmethod
 	def create_condition (cls):
@@ -25,6 +25,7 @@ class ConditionProvider ():
 	@classmethod
 	def set_handler (cls, id, handler):
 		cls.__conditions[id].handler = handler
+		cls.__conditions[id].priority = 4
 
 	@classmethod
 	def get_handler (cls, id):
@@ -33,7 +34,7 @@ class ConditionProvider ():
 	@classmethod
 	def attach_trigger (cls, condition_id, trigger_id):
 		cls.__conditions[condition_id].attached_triggers += 1
-		cls.__is_set_triggers[trigger_id] = False
+		cls.__is_activated_triggers[trigger_id] = False
 		list = cls.__attach_lists.get (trigger_id)
 		if list == None:
 			cls.__attach_lists[trigger_id] = []
@@ -43,6 +44,7 @@ class ConditionProvider ():
 
 	@classmethod
 	def activate_trigger (cls, trigger_id):
+		#print trigger_id
 		is_set = cls.__is_activated_triggers.get (trigger_id)
 		if is_set == False:
 			cls.__is_activated_triggers[trigger_id] = True
@@ -63,18 +65,19 @@ class ConditionProvider ():
 
 	@classmethod
 	def fire_condition (cls, id):
-		cls.__fired_conditions.append (cls.__conditions[id])
+		cls.__activated_conditions.append (cls.__conditions[id])
 
 	@classmethod
 	def dispatch_conditions (cls):
 		condition = None
-		if len (cls.__fired_conditions) > 0:
-			condition = cls.__fired_conditions.pop ()
+		if len (cls.__activated_conditions) > 0:
+			condition = cls.__activated_conditions.pop ()
 		while condition != None:
 			if condition.handler != "":
 				code_line = CodeLine ()
 				code_line.text = condition.handler
+				code_line.priority = condition.priority
 				CodeStack.push (code_line)
 			condition = None
-			if len (cls.__fired_conditions) > 0:
-				condition = cls.__fired_conditions.pop ()
+			if len (cls.__activated_conditions) > 0:
+				condition = cls.__activated_conditions.pop ()

@@ -12,3 +12,4 @@ class CodeLine ():
 	    self.text = ""
 	    self.field_id = 0
 	    self.tree = None
+	    self.priority = 1

@@ -1,6 +1,6 @@
 # coding: utf8
 """
-Стэк программных инструкций для выполнения
+Стек программных инструкций для выполнения
 """
 
 class CodeStack ():
@@ -31,3 +31,21 @@ class CodeStack ():
 			return True
 		else:
 			return False
+
+	@classmethod
+	def sort (cls):
+		for line in cls.__code_stack:
+			print "->", line.text
+		r = len (cls.__code_stack) - 1
+		i = 0
+		while i < r:
+			j = r
+			while j > i:
+				if cls.__code_stack[j-1].priority < cls.__code_stack[j].priority:
+					e = cls.__code_stack[j-1]
+					cls.__code_stack[j-1] = cls.__code_stack[j]
+					cls.__code_stack[j] = e
+				j -= 1
+			i += 1
+		for line in cls.__code_stack:
+			print "->", line.text

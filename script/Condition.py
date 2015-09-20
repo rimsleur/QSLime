@@ -6,6 +6,6 @@
 class Condition ():
 
 	def __init__ (self):
-		self.attached_events = 0
-		self.fired_events = 0
+		self.attached_triggers = 0
+		self.activated_triggers = 0
 		self.handler = ""
