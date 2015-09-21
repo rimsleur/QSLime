@@ -24,6 +24,7 @@ from Trigger import Trigger
 from TriggerType import TriggerType
 from ConditionProvider import ConditionProvider
 from CodeProvider import CodeProvider
+from SyntaxAnalyzer import SyntaxAnalyzer
 
 class SemanticAnalyzer ():
 
@@ -366,13 +367,92 @@ class SemanticAnalyzer ():
                                 if child.type == PropositionTreeNodeType.string:
                                     handler_text = child.text
                         i += 1
+                    #Предварительная загрузка процедур в память
+                    if handler_text != None:
+                        handler_text = handler_text.replace ("\\", "")
+                    actor = None
+                    actant = None
+                    analized = SyntaxAnalyzer.analize (handler_text)
+                    if analized == True:
+                        tree = SyntaxAnalyzer.proposition_tree
+                        # Раскрытие вложенных суждений
+                        node = tree.root_node
+                        node.child_index = 0
+                        side = None
+                        k = 0
+                        while node != None:
+                            if node.child_index == 0:
+                                if node.type == PropositionTreeNodeType.concept:
+                                    if node.concept.subroot == True:
+                                        child = None
+                                        if is_new == True:
+                                            if k == 2:
+                                                child = self.__replace_subtree (node, side, is_new)
+                                            else:
+                                                child = self.__replace_subtree (node, side, False)
+                                        else:
+                                            child = self.__replace_subtree (node, side, is_new)
+                                        if child != None:
+                                            parent.children[0] = child
+                                else:
+                                    side = node.side
+                            if node.child_index < len (node.children):
+                                idx = node.child_index
+                                node.child_index += 1
+                                tree.push_node (node)
+                                parent = node
+                                node = node.children[idx]
+                                node.child_index = 0
+                                k += 1
+                            else:
+                                node = tree.pop_node ()
+                                k -= 1
+                        actor, actant = self.__get_actor_and_actant (tree.root_node)
+                        #tree.print_tree ()
+                    if actor == None:
+                        return False
+                    if CodeProvider.is_procedure_already_loaded (actant.concept.id) == False:
+                        database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
+                        if database_concept == None:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return False
+                        database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
+                        if database_triad == None:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return None
+                        query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        rows = []
+                        list_concept_id = 0
+                        while (row != None):
+                            rows.append (row[0])
+                            row = self.__cursor.fetchone ()
+                        for row in rows:
+                            database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                            if database_triad == None:
+                                continue
+                            database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                            if database_concept == None:
+                                continue
+                            if database_concept.type != TreeNodeConceptType.dblist:
+                                continue
+                            list_concept_id = database_concept.id
+                        if list_concept_id == 0:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return False
+                        database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
+                        if database_list == None:
+                            self.__error_text = ErrorHelper.get_text (106)
+                            return False
+                        CodeProvider.load_procedure (actant.concept.id, database_list.concept_id)
+
+#***************
                     if trigger_id != 0:
                         if handler_text != None:
-                            handler_text = handler_text.replace ("\\", "")
                             TriggerProvider.set_handler (trigger_id, handler_text)
                     elif condition_id != 0:
                         if handler_text != None:
-                            handler_text = handler_text.replace ("\\", "")
                             ConditionProvider.set_handler (condition_id, handler_text)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-use"):
