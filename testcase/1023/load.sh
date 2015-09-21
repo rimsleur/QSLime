@@ -88,7 +88,10 @@ CONCEPT1=`./qconcept -m`
 CONCEPT2=`./qconcept -m`
 ./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT2"
 # Триггер ListIterator==1
-./qconcept -a $CONCEPT2 0 'печатать ?что значение ?какой "CLR[A".'; PREVLINE=`./qconcept -g`
+./qconcept -a $CONCEPT2 0 'печатать ?что значение ?какой "CLR[".'; PREVLINE=`./qconcept -g`
+./qconcept -a $CONCEPT2 $PREVLINE 'использовать ?что элемент (?чего (=список ?что иметь ?что имя ?какой XList), ?какой 1).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
+./qconcept -a $CONCEPT2 $PREVLINE 'преобразовывать (?что элемент ?как-что число, ?во-что Temp ?как-что буква).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
+./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?чего (=поле ?что иметь ?что имя ?какой Temp).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'использовать ?что элемент (?чего (=список ?что иметь ?что имя ?какой YList), ?какой ListIterator).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?чего элемент.'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?какой "]\n"'; PREVLINE=`echo "$PREVLINE + 1" | bc`
@@ -101,9 +104,12 @@ CONCEPT1=`./qconcept -m`
 CONCEPT2=`./qconcept -m`
 ./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT2"
 # Триггер ListIterator==3
-./qconcept -a $CONCEPT2 0 'использовать ?что элемент (?чего (=список ?что иметь ?что имя ?какой YList), ?какой ListIterator).'; PREVLINE=`./qconcept -g`
+./qconcept -a $CONCEPT2 0 'использовать ?что элемент (?чего (=список ?что иметь ?что имя ?какой XList), ?какой 1).'; PREVLINE=`./qconcept -g`
+./qconcept -a $CONCEPT2 $PREVLINE 'преобразовывать (?что элемент ?как-что число, ?во-что Temp ?как-что буква).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
+./qconcept -a $CONCEPT2 $PREVLINE 'использовать ?что элемент (?чего (=список ?что иметь ?что имя ?какой YList), ?какой ListIterator).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'увеличивать (?что значение ?чего элемент, ?на-сколько 1).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
-./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?какой "SET[A".'; PREVLINE=`echo "$PREVLINE + 1" | bc`
+./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?какой "SET[".'; PREVLINE=`echo "$PREVLINE + 1" | bc`
+./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?чего (=поле ?что иметь ?что имя ?какой Temp).'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?чего элемент.'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'печатать ?что значение ?какой "]\n".'; PREVLINE=`echo "$PREVLINE + 1" | bc`
 ./qconcept -a $CONCEPT2 $PREVLINE 'устанавливать ?что значение (?чего (=поле ?что иметь ?что имя ?какой ListIterator), ?какой 1).'; PREVLINE=`echo "$PREVLINE + 1" | bc`

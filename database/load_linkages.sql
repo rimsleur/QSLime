@@ -10,5 +10,6 @@ INSERT INTO `qsl_linkage` (`id`, `name`, `timestamp`) VALUES
 (NULL, 'на-что', NULL),
 (NULL, 'как-что', NULL),
 (NULL, 'на-сколько', NULL),
+(NULL, 'во-что', NULL),
 (NULL, 'к-чему', NULL);
 ALTER TABLE qsl_linkage AUTO_INCREMENT=100;

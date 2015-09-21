@@ -33,4 +33,9 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('to-add', 'RU', 'добавлять'),
 ('reference', 'RU', 'ссылка'),
 ('to-use', 'RU', 'использовать'),
-('as-what', 'RU', 'как-что');
+('to-convert', 'RU', 'преобразовывать'),
+('as-what', 'RU', 'как-что'),
+('into-what', 'RU', 'во-что'),
+('number', 'RU', 'число'),
+('character', 'RU', 'символ'),
+('letter', 'RU', 'буква');

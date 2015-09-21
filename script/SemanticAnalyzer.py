@@ -3,6 +3,7 @@
 Семантический анализатор
 """
 
+from string import uppercase
 from PropositionTreeNode import PropositionTreeNode
 from PropositionTreeNodeType import PropositionTreeNodeType
 from PropositionTreeNodeSide import PropositionTreeNodeSide
@@ -699,6 +700,68 @@ class SemanticAnalyzer ():
                             i += 1
                     if condition_id != 0:
                         ConditionProvider.attach_trigger (condition_id, trigger_id)
+
+            elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-convert"):
+                from_value = None
+                from_type = None
+                into_value = None
+                into_type = None
+                list_id = 0
+                element_id = 0
+                i = 0
+                while i < len (self.proposition_tree.root_node.children):
+                    child = self.proposition_tree.root_node.children[i]
+                    if child.type == PropositionTreeNodeType.linkage:
+                        if child.linkage.name == LanguageHelper.translate ("what"):
+                            child = child.children[0]
+                            if child.type == PropositionTreeNodeType.concept:
+                                if child.concept.name == LanguageHelper.translate ("field"):
+                                    pass
+                                elif child.concept.name == LanguageHelper.translate ("element"):
+                                    if list_id == 0:
+                                        node = ContextProvider.get_list_node ()
+                                        if node != None:
+                                            list_id = node.concept.id
+                                    if element_id == 0:
+                                        node = ContextProvider.get_element_node ()
+                                        if node != None:
+                                            element_id = node.concept.id
+                                    if list_id != 0 and element_id != 0:
+                                        from_value = MemoryProvider.get_list_element_value (list_id, element_id)
+                                else:
+                                    pass
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.linkage:
+                                    if child.linkage.name == LanguageHelper.translate ("as-what"):
+                                        child = child.children[0]
+                                        if child.type == PropositionTreeNodeType.concept:
+                                            if child.concept.name == LanguageHelper.translate ("number"):
+                                                from_type = 1
+                        elif child.linkage.name == LanguageHelper.translate ("into-what"):
+                            child = child.children[0]
+                            if child.type == PropositionTreeNodeType.concept:
+                                if child.concept.name == LanguageHelper.translate ("field"):
+                                    pass
+                                elif child.concept.name == LanguageHelper.translate ("element"):
+                                    pass
+                                else:
+                                    into_field_id = MemoryProvider.get_field_id (child.concept.name)
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.linkage:
+                                    if child.linkage.name == LanguageHelper.translate ("as-what"):
+                                        child = child.children[0]
+                                        if child.type == PropositionTreeNodeType.concept:
+                                            if child.concept.name == LanguageHelper.translate ("letter"):
+                                                into_type = 2
+                    i += 1
+                if from_value != None and into_field_id != None:
+                    if from_type == 1 and into_type == 2:
+                        from_value -= 1
+                        new_value = uppercase [from_value]
+                        MemoryProvider.set_field_value (into_field_id, new_value)
+
+            else:
+                pass
         else:
             # Запрос к базе знаний
             pass
