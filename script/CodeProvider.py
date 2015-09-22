@@ -5,6 +5,11 @@
 from CodeLine import CodeLine
 from CodeStack import CodeStack
 from SyntaxAnalyzer import SyntaxAnalyzer
+from HandlerVariables import HandlerVariables
+from PropositionTreeNodeType import PropositionTreeNodeType
+from TreeNodeConceptType import TreeNodeConceptType
+from PropositionTree import PropositionTree
+from MemoryProvider import MemoryProvider
 
 class CodeProvider ():
 
@@ -18,6 +23,7 @@ class CodeProvider ():
 		cls.__current_line = None
 		cls.__current_procedures = []
 		cls.__current_lines = []
+		cls.__handler_variables = []
 
 	@classmethod
 	def set_initial_procedure (cls, id):
@@ -38,7 +44,7 @@ class CodeProvider ():
 	@classmethod
 	def load_procedure (cls, concept_id, list_id):
 		cls.__procedures.append ([])
-		idx = len (cls.__procedures)-1
+		index = len (cls.__procedures)-1
 		query = "SELECT id, prev_line_id, text FROM qsl_list WHERE concept_id = " + str (list_id) + ";"
 		cls.__cursor.execute (query)
 		row = cls.__cursor.fetchone ()
@@ -54,9 +60,73 @@ class CodeProvider ():
 			code_line.text = row[2]
 			SyntaxAnalyzer.analize (code_line.text)
 			code_line.tree = SyntaxAnalyzer.proposition_tree
-			#SyntaxAnalyzer.proposition_tree.print_tree ()
-			cls.__procedures[idx].append (code_line)
-			cls.__procedures_keys[concept_id] = idx
+			#PropositionTree.print_tree (code_line.tree)
+			cls.__procedures[index].append (code_line)
+			cls.__procedures_keys[concept_id] = index
+			
+			# Раскрытие вложенных суждений
+			node = code_line.tree.root_node
+			if 1!=1: #node.text == "создавать":
+				node.child_index = 0
+				side = None
+				error_text = ""
+				k = 0
+				while node != None:
+					if node.child_index == 0:
+						if node.type == PropositionTreeNodeType.concept:
+							if node.concept.subroot == True:
+								child, error_text = PropositionTree.replace_subtree (node, side, True, cls.__cursor)
+								if child != None:
+									parent.children[0] = child
+						else:
+							side = node.side
+					if node.child_index < len (node.children):
+						idx = node.child_index
+						node.child_index += 1
+						code_line.tree.push_node (node)
+						parent = node
+						node = node.children[idx]
+						node.child_index = 0
+						k += 1
+					else:
+						node = code_line.tree.pop_node ()
+						k -= 1
+
+			#PropositionTree.print_tree (code_line.tree)
+			#continue
+
+			#Поиск всех переменных в коде
+			node = code_line.tree.root_node
+			node.child_index = 0
+			k = 0
+			while node != None:
+				if node.child_index == 0:
+					if node.type == PropositionTreeNodeType.concept:
+						if node.concept.type == TreeNodeConceptType.field or \
+						   node.concept.type == TreeNodeConceptType.element:
+							print "!!!", node.text
+							#pass
+						elif node.concept.type == TreeNodeConceptType.definition:
+							print "!!!", node.text
+							field_id = MemoryProvider.get_field_id (node.concept.name)
+							print "field", node.concept.name, field_id
+							if field_id == 0:
+								pass
+								list1_id = MemoryProvider.get_list_id (node.concept.name)
+								print "list", list1_id
+
+				if node.child_index < len (node.children):
+					idx = node.child_index
+					node.child_index += 1
+					code_line.tree.push_node (node)
+					node = node.children[idx]
+					node.child_index = 0
+					k += 1
+				else:
+					node = code_line.tree.pop_node ()
+					k -= 1
+
+			#stop = stop
 
 	@classmethod
 	def execute_procedure (cls, concept_id):
@@ -89,3 +159,8 @@ class CodeProvider ():
 			if cls.__current_procedure == None:
 				CodeStack.inside_procedure = False
 			return False
+
+	@classmethod
+	def add_handler_variables (cls, handler_variables):
+		print "!!!add_handler_variables"
+		cls.__handler_variables.append (handler_variables)

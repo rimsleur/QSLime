@@ -16,6 +16,8 @@ from ContextProvider import ContextProvider
 from TriggerProvider import TriggerProvider
 from ConditionProvider import ConditionProvider
 from CodeProvider import CodeProvider
+from PropositionTree import PropositionTree
+
 reload (sys)
 
 def main (single_run, text):
