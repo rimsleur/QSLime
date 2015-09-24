@@ -33,7 +33,7 @@ class TriggerProvider ():
 		cls.__triggers.append (trigger)
 		id = len (cls.__triggers) - 1
 
-		print "trigger_id=", id, " object_key=", object_key, " condition=", trigger_condition, " value", field_value
+		#print "trigger_id=", id, " object_key=", object_key, " condition=", trigger_condition, " value", field_value
 
 		object_triggers = cls.get_object_triggers (object_key)
 		if object_triggers == None:
@@ -116,13 +116,13 @@ class TriggerProvider ():
 					if cls.__triggers[id].type == TriggerType.on_change:
 						if cls.__triggers[id].active == True:
 							cls.__triggers[id].active = False
-							print "D", cls.__triggers[id].condition, cls.__triggers[id].value
+							#print "D", cls.__triggers[id].condition, cls.__triggers[id].value
 							ConditionProvider.deactivate_trigger (id)
 					deferred_activation.append (id)
 				else:
-					print "deact", object_key, cls.__triggers[id].condition, cls.__triggers[id].value, object_value
+					#print "deact", object_key, cls.__triggers[id].condition, cls.__triggers[id].value, object_value
 					if cls.__triggers[id].active == True:
-						print "D", cls.__triggers[id].condition, cls.__triggers[id].value
+						#print "D", cls.__triggers[id].condition, cls.__triggers[id].value
 						cls.__triggers[id].active = False
 						n = cls.__activated_triggers.count (id)
 						if n != 0:
@@ -130,7 +130,7 @@ class TriggerProvider ():
 						ConditionProvider.deactivate_trigger (id)
 
 			for id in deferred_activation:
-				print "act", object_key, cls.__triggers[id].condition, cls.__triggers[id].value, object_value
+				#print "act", object_key, cls.__triggers[id].condition, cls.__triggers[id].value, object_value
 				if cls.__triggers[id].active == False:
 					cls.__triggers[id].active = True
 					cls.__activated_triggers.append (id)

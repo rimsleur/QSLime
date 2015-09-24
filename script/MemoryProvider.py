@@ -32,7 +32,7 @@ class MemoryProvider ():
 
 	@classmethod
 	def get_field_id (cls, name):
-		print cls.__field_name_dict.values ()
+		#print cls.__field_name_dict.values ()
 		return cls.__field_name_dict.get (name)
 
 	@classmethod

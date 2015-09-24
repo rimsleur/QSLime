@@ -616,6 +616,16 @@ class SemanticAnalyzer ():
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
                                     new_value = int (child.text)
+                                elif child.type == PropositionTreeNodeType.concept:
+                                    if child.concept.name == LanguageHelper.translate ("field"):
+                                        node = ContextProvider.get_field_node ()
+                                        if node != None:
+                                            field_id = node.concept.id
+                                    else:
+                                        if child.concept.type == TreeNodeConceptType.definition:
+                                            new_value = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.concept.name))
+                                        else:
+                                            new_value = MemoryProvider.get_field_value (child.concept.id)
                         i += 1
                     if field_id != 0:
                         if new_value != None:

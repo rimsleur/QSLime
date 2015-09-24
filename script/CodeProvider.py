@@ -99,34 +99,31 @@ class CodeProvider ():
 			node = code_line.tree.root_node
 			node.child_index = 0
 			k = 0
+			parent = None
 			while node != None:
 				if node.child_index == 0:
 					if node.type == PropositionTreeNodeType.concept:
 						if node.concept.type == TreeNodeConceptType.field or \
 						   node.concept.type == TreeNodeConceptType.element:
-							print "!!!", node.text
-							#pass
+						   pass
 						elif node.concept.type == TreeNodeConceptType.definition:
-							print "!!!", node.text
 							field_id = MemoryProvider.get_field_id (node.concept.name)
-							print "field", node.concept.name, field_id
-							if field_id == 0:
-								pass
+							if field_id != None:
+								print parent.text, node.concept.name, field_id
+							else:
 								list1_id = MemoryProvider.get_list_id (node.concept.name)
-								print "list", list1_id
 
 				if node.child_index < len (node.children):
 					idx = node.child_index
 					node.child_index += 1
 					code_line.tree.push_node (node)
+					parent = node
 					node = node.children[idx]
 					node.child_index = 0
 					k += 1
 				else:
 					node = code_line.tree.pop_node ()
 					k -= 1
-
-			#stop = stop
 
 	@classmethod
 	def execute_procedure (cls, concept_id):

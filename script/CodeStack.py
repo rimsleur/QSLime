@@ -35,7 +35,8 @@ class CodeStack ():
 	@classmethod
 	def sort (cls):
 		for line in cls.__code_stack:
-			print "->", line.text
+			#print "->", line.text
+			pass
 		r = len (cls.__code_stack) - 1
 		i = 0
 		while i < r:
@@ -48,4 +49,5 @@ class CodeStack ():
 				j -= 1
 			i += 1
 		for line in cls.__code_stack:
-			print "->", line.text
+			#print "->", line.text
+			pass
