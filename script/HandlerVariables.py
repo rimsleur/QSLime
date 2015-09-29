@@ -9,4 +9,4 @@ class HandlerVariables ():
 		self.Type = ""
 		self.id = 0
 		self.variables = []
-		self.read_only = []
+		self.changeable = []

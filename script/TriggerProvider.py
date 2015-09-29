@@ -64,16 +64,20 @@ class TriggerProvider ():
 		cls.__triggers[id].handler = handler
 		#print cls.__events[id].key
 		#Проработать
-		if id == 3:
-			cls.__triggers[id].priority = 2
-		elif id == 4:
-			cls.__triggers[id].priority = 3
-		elif id == 1:
-			cls.__triggers[id].priority = 1
+		#if id == 3:
+			#cls.__triggers[id].priority = 2
+		#elif id == 4:
+			#cls.__triggers[id].priority = 3
+		#elif id == 1:
+			#cls.__triggers[id].priority = 1
 
 	@classmethod
 	def get_handler (cls, id):
 		return cls.__triggers[id].handler
+
+	@classmethod
+	def set_priority (cls, id, priority):
+		cls.__triggers[id].priority = priority
 
 	#@classmethod
 	#def get_trigger_id (cls, key):

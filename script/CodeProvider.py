@@ -24,6 +24,10 @@ class CodeProvider ():
 		cls.__current_procedures = []
 		cls.__current_lines = []
 		cls.__handler_variables = []
+		cls.__priorities_assigned = False
+
+		#Переделать
+		cls.TEMPL1 = "увеличивать_?что_значение_?чего"
 
 	@classmethod
 	def set_initial_procedure (cls, id):
@@ -42,7 +46,7 @@ class CodeProvider ():
 			return False
 
 	@classmethod
-	def load_procedure (cls, concept_id, list_id):
+	def load_procedure (cls, concept_id, list_id, handler_variables):
 		cls.__procedures.append ([])
 		index = len (cls.__procedures)-1
 		query = "SELECT id, prev_line_id, text FROM qsl_list WHERE concept_id = " + str (list_id) + ";"
@@ -108,10 +112,25 @@ class CodeProvider ():
 						   pass
 						elif node.concept.type == TreeNodeConceptType.definition:
 							field_id = MemoryProvider.get_field_id (node.concept.name)
+							s = ""
 							if field_id != None:
-								print parent.text, node.concept.name, field_id
+								#print parent.text, node.concept.name, field_id
+								node1 = node.parent 
+								while node1 != None:
+									if s != "":
+										s = node1.text + '_' + s
+									else:
+										s = node1.text
+									node1 = node1.parent
 							else:
 								list1_id = MemoryProvider.get_list_id (node.concept.name)
+							if s != "":
+								handler_variables.variables.append (field_id)
+								if s == cls.TEMPL1:
+									print s
+									handler_variables.changeable.append (True)
+								else:
+									handler_variables.changeable.append (False)
 
 				if node.child_index < len (node.children):
 					idx = node.child_index
@@ -124,6 +143,9 @@ class CodeProvider ():
 				else:
 					node = code_line.tree.pop_node ()
 					k -= 1
+
+		cls.__handler_variables.append (handler_variables)
+		print "added"
 
 	@classmethod
 	def execute_procedure (cls, concept_id):
@@ -158,6 +180,64 @@ class CodeProvider ():
 			return False
 
 	@classmethod
-	def add_handler_variables (cls, handler_variables):
-		print "!!!add_handler_variables"
-		cls.__handler_variables.append (handler_variables)
+	def is_priorities_assigned (cls):
+		return cls.__priorities_assigned
+
+	@classmethod
+	def assign_priorities (cls):
+		print "assigned"
+
+		variables = []
+		variables.append (None)
+		variables_ids = {}
+		var_procs_read = []
+		var_procs_read.append (None)
+		var_procs_write = []
+		var_procs_write.append (None)
+
+		for hv in cls.__handler_variables:
+			print hv.id
+			vi = 0
+			for v in hv.variables:
+				print v
+				id = variables_ids.get (v)
+				if id == None:
+					i = len (variables)
+					print "@", i
+					variables.append (v)
+					variables_ids[v] = i
+					var_procs_read.append ([])
+					var_procs_write.append ([])
+					if hv.changeable[vi] == False:
+						var_procs_read[i].append (hv.id)
+					else:
+						var_procs_write[i].append (hv.id)
+				else:
+					found = False
+					if hv.changeable[vi] == False:
+						for vp in var_procs_read[i]:
+							if vp == hv.id:
+								found = True
+						if found == False:
+							var_procs_read[i].append (hv.id)
+					else:
+						for vp in var_procs_write[i]:
+							if vp == hv.id:
+								found = True
+						if found == False:
+							var_procs_write[i].append (hv.id)
+
+				vi += 1
+
+		vi = 0
+		for v in variables:
+			if v != None:
+				print "v", v
+				for w in var_procs_write[vi]:
+					print "w", w
+				for r in var_procs_read[vi]:
+					print "r", r
+
+			vi += 1
+
+		cls.__priorities_assigned = True
