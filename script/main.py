@@ -76,6 +76,8 @@ def main (single_run, text):
                 return SyntaxAnalyzer.get_error_text ()
             if CodeStack.is_empty () == True:
                 if CodeStack.inside_procedure == False:
+                    if CodeProvider.is_priorities_assigned () == False:
+                        CodeProvider.assign_priorities ()
                     TriggerProvider.dispatch_triggers ()
                     ConditionProvider.dispatch_conditions ()
                     CodeStack.sort ()

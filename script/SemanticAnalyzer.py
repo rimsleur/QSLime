@@ -57,12 +57,7 @@ class SemanticAnalyzer ():
                     else:
                         CodeStack.inside_procedure = False
                 else:
-                    if CodeProvider.is_priorities_assigned () == False:
-                        CodeProvider.assign_priorities ()
                     CodeProvider.prepare_next_line ()
-            else:
-                if CodeProvider.is_priorities_assigned () == False:
-                    CodeProvider.assign_priorities ()
 
         if self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-create"):
             is_new = True
@@ -463,14 +458,14 @@ class SemanticAnalyzer ():
                         if trigger_id != 0:
                             if handler_text != None:
                                 TriggerProvider.set_handler (trigger_id, handler_text)
-                                handler_variables.type = 'T'
-                                handler_variables.id = trigger_id
+                                #handler_variables.type = 'T'
+                                handler_variables.id = 'T' + str (trigger_id)
                                 CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, handler_variables)
                         elif condition_id != 0:
                             if handler_text != None:
                                 ConditionProvider.set_handler (condition_id, handler_text)
-                                handler_variables.type = 'C'
-                                handler_variables.id = condition_id
+                                #handler_variables.type = 'C'
+                                handler_variables.id = 'C' + str (condition_id)
                                 CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, handler_variables)
                         else:
                             CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, None)

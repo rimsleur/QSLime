@@ -6,7 +6,7 @@
 class HandlerVariables ():
 
 	def __init__ (self):
-		self.Type = ""
-		self.id = 0
+		#self.Type = ""
+		self.id = None
 		self.variables = []
 		self.changeable = []

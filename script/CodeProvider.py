@@ -10,6 +10,7 @@ from PropositionTreeNodeType import PropositionTreeNodeType
 from TreeNodeConceptType import TreeNodeConceptType
 from PropositionTree import PropositionTree
 from MemoryProvider import MemoryProvider
+from TriggerProvider import TriggerProvider
 
 class CodeProvider ():
 
@@ -125,12 +126,24 @@ class CodeProvider ():
 							else:
 								list1_id = MemoryProvider.get_list_id (node.concept.name)
 							if s != "":
-								handler_variables.variables.append (field_id)
-								if s == cls.TEMPL1:
-									print s
-									handler_variables.changeable.append (True)
+								i = None
+								vi = 0
+								for v in handler_variables.variables:
+									if v == field_id:
+										i = vi
+										break
+									vi += 1
+								if i == None:
+									handler_variables.variables.append (field_id)
+									if s == cls.TEMPL1:
+										#print s
+										handler_variables.changeable.append (True)
+									else:
+										handler_variables.changeable.append (False)
 								else:
-									handler_variables.changeable.append (False)
+									if s == cls.TEMPL1:
+										if handler_variables.changeable[i] == False:
+											handler_variables.changeable[i] = True
 
 				if node.child_index < len (node.children):
 					idx = node.child_index
@@ -145,7 +158,6 @@ class CodeProvider ():
 					k -= 1
 
 		cls.__handler_variables.append (handler_variables)
-		print "added"
 
 	@classmethod
 	def execute_procedure (cls, concept_id):
@@ -185,8 +197,6 @@ class CodeProvider ():
 
 	@classmethod
 	def assign_priorities (cls):
-		print "assigned"
-
 		variables = []
 		variables.append (None)
 		variables_ids = {}
@@ -194,16 +204,20 @@ class CodeProvider ():
 		var_procs_read.append (None)
 		var_procs_write = []
 		var_procs_write.append (None)
+		preproc = []
+		postproc = []
+		postproc_ids = {}
 
 		for hv in cls.__handler_variables:
-			print hv.id
+			#print "hv", hv.id
 			vi = 0
 			for v in hv.variables:
-				print v
+				#print "v", v, hv.changeable[vi]
 				id = variables_ids.get (v)
+				#print "id", id
 				if id == None:
 					i = len (variables)
-					print "@", i
+					#print "i", i
 					variables.append (v)
 					variables_ids[v] = i
 					var_procs_read.append ([])
@@ -215,29 +229,65 @@ class CodeProvider ():
 				else:
 					found = False
 					if hv.changeable[vi] == False:
-						for vp in var_procs_read[i]:
+						for vp in var_procs_read[id]:
 							if vp == hv.id:
 								found = True
 						if found == False:
-							var_procs_read[i].append (hv.id)
+							var_procs_read[id].append (hv.id)
 					else:
-						for vp in var_procs_write[i]:
+						for vp in var_procs_write[id]:
 							if vp == hv.id:
 								found = True
 						if found == False:
-							var_procs_write[i].append (hv.id)
+							var_procs_write[id].append (hv.id)
 
 				vi += 1
+
+		#print "----"
+		#vi = 0
+		#for v in variables:
+		#	if v != None:
+		#		print "v", v
+		#		for w in var_procs_write[vi]:
+		#			print "w", w
+		#		for r in var_procs_read[vi]:
+		#			print "r", r
+		#	vi += 1
+		#print "----"
 
 		vi = 0
 		for v in variables:
 			if v != None:
-				print "v", v
 				for w in var_procs_write[vi]:
-					print "w", w
-				for r in var_procs_read[vi]:
-					print "r", r
-
+					for r in var_procs_read[vi]:
+						#print r , "->", w
+						preproc.append (r)
+						postproc_ids[w] = len (postproc)
+						postproc.append (w)
 			vi += 1
+
+		l = len (preproc)
+		i = 0
+		while i < l:
+			if postproc_ids.get (preproc[i]):
+				print "found"
+			else:
+				t = preproc[i][:1]
+				id = int (preproc[i][1:])
+				#print t, id
+				priority = 1
+				if t == 'T':
+					TriggerProvider.set_priority (id, priority)
+				elif t == 'C':
+					ConditionProvider.set_priority (id, priority)
+				t = postproc[i][:1]
+				id = int (postproc[i][1:])
+				#print t, id
+				priority += 1
+				if t == 'T':
+					TriggerProvider.set_priority (id, priority)
+				elif t == 'C':
+					ConditionProvider.set_priority (id, priority)
+			i += 1
 
 		cls.__priorities_assigned = True
