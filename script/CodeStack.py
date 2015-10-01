@@ -51,3 +51,4 @@ class CodeStack ():
 		for line in cls.__code_stack:
 			#print "->", line.text
 			pass
+		#stop = stop

@@ -32,6 +32,10 @@ class ConditionProvider ():
 		return cls.__conditions[id].handler
 
 	@classmethod
+	def set_priority (cls, id, priority):
+		cls.__conditions[id].priority = priority
+
+	@classmethod
 	def attach_trigger (cls, condition_id, trigger_id):
 		cls.__conditions[condition_id].attached_triggers += 1
 		cls.__is_activated_triggers[trigger_id] = False

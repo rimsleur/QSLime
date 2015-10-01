@@ -11,6 +11,7 @@ from TreeNodeConceptType import TreeNodeConceptType
 from PropositionTree import PropositionTree
 from MemoryProvider import MemoryProvider
 from TriggerProvider import TriggerProvider
+from ConditionProvider import ConditionProvider
 
 class CodeProvider ():
 
@@ -29,6 +30,8 @@ class CodeProvider ():
 
 		#Переделать
 		cls.TEMPL1 = "увеличивать_?что_значение_?чего"
+		cls.TEMPL2 = "преобразовывать_?во-что"
+		cls.TEMPL3 = "устанавливать_?что_значение_?чего"
 
 	@classmethod
 	def set_initial_procedure (cls, id):
@@ -135,13 +138,15 @@ class CodeProvider ():
 									vi += 1
 								if i == None:
 									handler_variables.variables.append (field_id)
-									if s == cls.TEMPL1:
+									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3:
 										#print s
 										handler_variables.changeable.append (True)
 									else:
+										#print s
 										handler_variables.changeable.append (False)
 								else:
-									if s == cls.TEMPL1:
+									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3:
+										#print s
 										if handler_variables.changeable[i] == False:
 											handler_variables.changeable[i] = True
 
@@ -243,17 +248,17 @@ class CodeProvider ():
 
 				vi += 1
 
-		#print "----"
-		#vi = 0
-		#for v in variables:
-		#	if v != None:
-		#		print "v", v
-		#		for w in var_procs_write[vi]:
-		#			print "w", w
-		#		for r in var_procs_read[vi]:
-		#			print "r", r
-		#	vi += 1
-		#print "----"
+		"""print "----"
+		vi = 0
+		for v in variables:
+			if v != None:
+				print "v", v
+				for w in var_procs_write[vi]:
+					print "w", w
+				for r in var_procs_read[vi]:
+					print "r", r
+			vi += 1
+		print "----"""
 
 		vi = 0
 		for v in variables:
@@ -269,21 +274,22 @@ class CodeProvider ():
 		l = len (preproc)
 		i = 0
 		while i < l:
+			print i, l
 			if postproc_ids.get (preproc[i]):
 				print "found"
 			else:
 				t = preproc[i][:1]
 				id = int (preproc[i][1:])
-				#print t, id
 				priority = 1
+				#print t + str (id), priority
 				if t == 'T':
 					TriggerProvider.set_priority (id, priority)
 				elif t == 'C':
 					ConditionProvider.set_priority (id, priority)
 				t = postproc[i][:1]
 				id = int (postproc[i][1:])
-				#print t, id
 				priority += 1
+				#print t + str (id), priority
 				if t == 'T':
 					TriggerProvider.set_priority (id, priority)
 				elif t == 'C':
