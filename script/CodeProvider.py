@@ -274,7 +274,6 @@ class CodeProvider ():
 		l = len (preproc)
 		i = 0
 		while i < l:
-			print i, l
 			if postproc_ids.get (preproc[i]):
 				print "found"
 			else:
