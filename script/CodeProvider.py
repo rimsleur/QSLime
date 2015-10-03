@@ -32,6 +32,8 @@ class CodeProvider ():
 		cls.TEMPL1 = "увеличивать_?что_значение_?чего"
 		cls.TEMPL2 = "преобразовывать_?во-что"
 		cls.TEMPL3 = "устанавливать_?что_значение_?чего"
+		cls.TEMPL4 = "увеличивать_?что_значение_?чего_элемент_?чего"
+		cls.TEMPL5 = "устанавливать_?что_значение_?чего_элемент_?чего"
 
 	@classmethod
 	def set_initial_procedure (cls, id):
@@ -106,6 +108,9 @@ class CodeProvider ():
 			#Поиск всех переменных в коде
 			node = code_line.tree.root_node
 			node.child_index = 0
+			field_id = None
+			list1_id = None
+			element1_id = None
 			k = 0
 			parent = None
 			while node != None:
@@ -128,24 +133,60 @@ class CodeProvider ():
 									node1 = node1.parent
 							else:
 								list1_id = MemoryProvider.get_list_id (node.concept.name)
+								if list1_id != None:
+									#print parent.text, node.concept.name, list1_id
+									node1 = node.parent 
+									while node1 != None:
+										#print node1.text
+										if node1.text == "элемент":
+											i = 0
+											node2 = node1.children[i]
+											while node2 != None and node2.text != "?какой":
+												node2 = node1.children[i]
+												i += 1
+											if node2 != None and node2.text == "?какой":
+												node2 = node2.children[0]
+												if node2.type == PropositionTreeNodeType.number:
+													element1_id = int (node2.text)
+										if s != "":
+											s = node1.text + '_' + s
+										else:
+											s = node1.text
+										node1 = node1.parent	
 							if s != "":
 								i = None
 								vi = 0
 								for v in handler_variables.variables:
-									if v == field_id:
-										i = vi
-										break
+									if field_id != None:
+										if v[:1] == 'F':
+											if int (v[1:]) == field_id:
+												i = vi
+												break
+									elif list1_id != None:
+										if v[:1] == 'L':
+											n = v.find ('.')
+											if n != 0:
+												if int (v[1:n]) == list1_id:
+													i = vi
+													break
 									vi += 1
 								if i == None:
-									handler_variables.variables.append (field_id)
-									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3:
+									if field_id != None:
+										object_key = 'F' + str (field_id)
+										handler_variables.variables.append (object_key)
+									elif list1_id != None:
+										object_key = 'L' + str (list1_id) + '.' + str (element1_id)
+										handler_variables.variables.append (object_key)
+									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3 \
+									or s == cls.TEMPL4 or s == cls.TEMPL5:
 										#print s
 										handler_variables.changeable.append (True)
 									else:
 										#print s
 										handler_variables.changeable.append (False)
 								else:
-									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3:
+									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3 \
+									or s == cls.TEMPL4 or s == cls.TEMPL5:
 										#print s
 										if handler_variables.changeable[i] == False:
 											handler_variables.changeable[i] = True
