@@ -54,7 +54,7 @@ def main (single_run, text):
     while (exit != True):
         code_line = CodeStack.pop ()
         while (code_line != None):
-            print code_line.text
+            #print code_line.text
             analized = True
             if code_line.tree == None:
                 analized = SyntaxAnalyzer.analize (code_line.text)

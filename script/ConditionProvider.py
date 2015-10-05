@@ -12,15 +12,23 @@ class ConditionProvider ():
 	def __init__ (cls):
 		cls.__conditions = []
 		cls.__conditions.append (None)
+		cls.__condition_name_dict = {}
 		cls.__is_activated_triggers = {}
 		cls.__attach_lists = {}
 		cls.__activated_conditions = []
 
 	@classmethod
-	def create_condition (cls):
+	def create_condition (cls, name):
 		condition = Condition ()
 		cls.__conditions.append (condition)
-		return len (cls.__conditions) - 1
+		id = len (cls.__conditions) - 1
+		if name != None:
+			cls.__condition_name_dict[name] = id
+		return id
+
+	@classmethod
+	def get_condition_id (cls, name):
+		return cls.__condition_name_dict.get (name)
 
 	@classmethod
 	def set_handler (cls, id, handler):

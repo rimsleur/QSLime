@@ -14,6 +14,8 @@ from DatabaseSequence import DatabaseSequence
 from DatabaseConcept import DatabaseConcept
 from MemoryProvider import MemoryProvider
 from TreeNodeConceptType import TreeNodeConceptType
+from ConditionProvider import ConditionProvider
+from ErrorHelper import ErrorHelper
 
 class PropositionTree ():
 
@@ -139,6 +141,18 @@ class PropositionTree ():
 									result_node.concept.type = TreeNodeConceptType.memlist
 									result_node.concept.name = "$" + str (result_node.concept.id)
 									result_node.text = result_node.concept.name
+				if actor.concept.name == LanguageHelper.translate ("condition"):
+					child1 = actant.children[0]
+					if child1.type == PropositionTreeNodeType.linkage:
+						if child1.linkage.name == LanguageHelper.translate ("which"):
+							child2 = child1.children[0]
+							if child2.type == PropositionTreeNodeType.concept:
+								if is_new == True:
+									result_node.concept.id = ConditionProvider.create_condition (child2.concept.name)
+									result_node.concept.type = TreeNodeConceptType.condition
+									result_node.concept.name = "$" + str (result_node.concept.id)
+									result_node.text = result_node.concept.name
+									ContextProvider.set_condition_node (result_node)
 				elif actor.concept.name == LanguageHelper.translate ("procedure"):
 					child1 = actant.children[0]
 					if child1.type == PropositionTreeNodeType.linkage:

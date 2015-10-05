@@ -14,10 +14,16 @@ class MemoryProvider ():
 		cls.__fields.append (None)
 		cls.__last_field_index = 0
 		cls.__field_name_dict = {}
+
 		cls.__lists = []
 		cls.__lists.append (None)
 		cls.__last_list_index = 0
 		cls.__list_name_dict = {}
+
+		cls.__records = []
+		cls.__records.append (None)
+		cls.__last_record_index = 0
+		cls.__record_name_dict = {}
 
 	@classmethod
 	def create_field (cls, name):

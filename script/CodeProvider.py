@@ -311,7 +311,7 @@ class CodeProvider ():
 						postproc_ids[w] = len (postproc)
 						postproc.append (w)
 			vi += 1
-
+		return
 		l = len (preproc)
 		i = 0
 		while i < l:
