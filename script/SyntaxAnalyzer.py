@@ -44,7 +44,6 @@ class SyntaxAnalyzer ():
                     word = []
             elif letter == "(" or \
                  letter == ")" or \
-                 letter == "." or \
                  letter == "," or \
                  letter == "_":
                 if len (word) > 0:
@@ -55,6 +54,45 @@ class SyntaxAnalyzer ():
                 token = Token ()
                 token.text = letter
                 tokens.append (token)
+            elif letter == ".":
+                j = i + 1
+                if j == len (text):
+                    if len (word) > 0:
+                        token = Token ()
+                        token.text = ''.join (word)
+                        tokens.append (token)
+                        word = []
+                    token = Token ()
+                    token.text = letter
+                    tokens.append (token)
+                while j < len (text):
+                    letter = text[j]
+
+                    if letter == " " or \
+                       letter == ")" or \
+                       letter == "(":
+                        break
+                    if i == (j - 1):
+                        if letter == " ":
+                            if len (word) > 0:
+                                token = Token ()
+                                token.text = ''.join (word)
+                                tokens.append (token)
+                                word = []
+                            token = Token ()
+                            token.text = letter
+                            tokens.append (token)
+                            break
+                        else:
+                            word.append (text[i])
+                            prev_letter = letter
+                            word.append (letter)
+                            j += 1
+                    else:
+                        prev_letter = letter
+                        word.append (letter)
+                        j += 1
+                i = j
             elif letter == "=":
                 if prev_letter == " " or \
                    prev_letter == "(":
