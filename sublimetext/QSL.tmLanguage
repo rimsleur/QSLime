@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+	<dict>
+
+		<key>fileTypes</key>
+		<array>
+			<string>qsl</string>
+		</array>
+		
+		<key>patterns</key>
+		<array>
+			<dict>
+				<key>comment</key>
+				<string>Комментарий</string>
+				<key>match</key>
+				<string>\#.*\n</string>
+				<key>name</key>
+				<string>comment</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Строка в кавычках</string>
+				<key>match</key>
+				<string>\".*\"</string>
+				<key>name</key>
+				<string>string</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Цифра</string>
+				<key>match</key>
+				<string>(\s|\.)\d*\d</string>
+				<key>name</key>
+				<string>digit</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Понятие действия</string>
+				<key>match</key>
+				<string>\w*(ать|ять|еть)\b</string>
+				<key>name</key>
+				<string>concept.action</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Понятие определения</string>
+				<key>match</key>
+				<string>\b(поле|список|элемент|имя|приоритет|значение|изменение|число|буква)\b</string>
+				<key>name</key>
+				<string>concept.definition</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Линкат</string>
+				<key>match</key>
+				<string>\?(\w|\-)*</string>
+				<key>name</key>
+				<string>linkage</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Ключевые слова: процедура, модуль, обработчик</string>
+				<key>match</key>
+				<string>\b(процедура|модуль|обработчик)\b</string>
+				<key>name</key>
+				<string>procedure</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Ключевые слова: триггер, условие</string>
+				<key>match</key>
+				<string>\b(триггер|условие)\b</string>
+				<key>name</key>
+				<string>trigger</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
+				<string>Скобки</string>
+				<key>match</key>
+				<string>[\(,\)]</string>
+				<key>name</key>
+				<string>paranthesis</string>
+			</dict>
+
+		</array>
+
+		<key>name</key>
+		<string>QSL</string>
+		<key>scopeName</key>
+		<string>QSL</string>
+	</dict>
+</plist>

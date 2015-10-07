@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+	<dict>
+		<key>name</key>
+		<string>QSL</string>
+		<key>settings</key>
+		<array>
+			<dict>
+				<key>settings</key>
+				<dict>
+					<key>background</key>
+					<string>#272822</string>
+					<key>caret</key>
+					<string>#F8F8F0</string>
+					<key>foreground</key>
+					<string>#F8F8F2</string>
+					<key>invisibles</key>
+					<string>#3B3A32</string>
+					<key>lineHighlight</key>
+					<string>#3E3D32</string>
+					<key>selection</key>
+					<string>#49483E</string>
+					<key>findHighlight</key>
+					<string>#FFE792</string>
+					<key>findHighlightForeground</key>
+					<string>#000000</string>
+					<key>selectionBorder</key>
+					<string>#222218</string>
+					<key>activeGuide</key>
+					<string>#9D550FB0</string>
+
+					<key>bracketsForeground</key>
+					<string>#F8F8F2A5</string>
+					<key>bracketsOptions</key>
+					<string>underline</string>
+
+					<key>bracketContentsForeground</key>
+					<string>#F8F8F2A5</string>
+					<key>bracketContentsOptions</key>
+					<string>underline</string>
+
+					<key>tagsOptions</key>
+					<string>stippled_underline</string>
+				</dict>
+			</dict>
+		
+			<dict>
+				<key>scope</key>
+				<string>comment</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#B5B09C</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>string</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#E6DB74</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>digit</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#AE81FF</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>concept.action</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#F92672</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>concept.definition</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#CACAFF</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>linkage</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#75715E</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>procedure</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#66D9EF</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>trigger</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#FABE78</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
+				<string>paranthesis</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#FD971F</string>
+				</dict>
+			</dict>
+
+		</array>
+	</dict>
+</plist>
