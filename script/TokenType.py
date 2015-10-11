@@ -16,3 +16,4 @@ class TokenType ():
     equal_sign = 10
     number = 11
     string = 12
+    code_object = 13

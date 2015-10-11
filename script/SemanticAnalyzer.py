@@ -291,8 +291,8 @@ class SemanticAnalyzer ():
                                                     child1 = child1.children[0]
                                                     if child1.type == PropositionTreeNodeType.number:
                                                         element_id = int (child1.text)
-                                                    elif child1.type == PropositionTreeNodeType.concept:
-                                                        element_id = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child1.concept.name))
+                                                    elif child1.type == PropositionTreeNodeType.code_object:
+                                                        element_id = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child1.text))
                                             j += 1
                                         if list_id == 0:
                                             node = ContextProvider.get_list_node ()
@@ -303,10 +303,9 @@ class SemanticAnalyzer ():
                                             if node != None:
                                                 element_id = node.concept.id
                                     else:
-                                        if child.concept.type == TreeNodeConceptType.definition:
-                                            field_id = MemoryProvider.get_field_id (child.concept.name)
-                                        else:
-                                            field_id = child.concept.id
+                                        field_id = child.concept.id
+                                elif child.type == PropositionTreeNodeType.code_object:
+                                    field_id = MemoryProvider.get_field_id (child.text)
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
@@ -327,6 +326,8 @@ class SemanticAnalyzer ():
                                             new_value = MemoryProvider.get_list_element_value (list1_id, element1_id)
                                     else:
                                         new_value = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.concept.name))
+                                elif child.type == PropositionTreeNodeType.code_object:
+                                    new_value = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.text))
                         i += 1
                     if field_id != 0:
                         if new_value != None:
@@ -521,16 +522,15 @@ class SemanticAnalyzer ():
                                         if node != None:
                                             list_id = node.concept.id
                                     else:
-                                        if child.concept.type == TreeNodeConceptType.definition:
-                                            list_id = MemoryProvider.get_list_id (child.concept.name)
-                                        else:
-                                            list_id = child.concept.id
+                                        list_id = MemoryProvider.get_list_id (child.concept.name)
+                                if child.type == PropositionTreeNodeType.code_object:
+                                    list_id = MemoryProvider.get_list_id (child.text)
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
                                     element_id = int (child.text)
-                                elif child.type == PropositionTreeNodeType.concept:
-                                    element_id = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.concept.name))
+                                elif child.type == PropositionTreeNodeType.code_object:
+                                    element_id = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.text))
                         i += 1
                     i = 0
                     while i < len (self.proposition_tree.root_node.children):
@@ -643,10 +643,9 @@ class SemanticAnalyzer ():
                                             if node != None:
                                                 element_id = node.concept.id
                                     else:
-                                        if child.concept.type == TreeNodeConceptType.definition:
-                                            field_id = MemoryProvider.get_field_id (child.concept.name)
-                                        else:
-                                            field_id = child.concept.id
+                                        field_id = child.concept.id
+                                elif child.type == PropositionTreeNodeType.code_object:
+                                    field_id = MemoryProvider.get_field_id (child.text)
                             #elif child.linkage.name == LanguageHelper.translate ("which"):
                             #    child = child.children[0]
                             #    if child.type == PropositionTreeNodeType.number:
@@ -772,10 +771,9 @@ class SemanticAnalyzer ():
                                             if node != None:
                                                 element_id = node.concept.id
                                     else:
-                                        if child.concept.type == TreeNodeConceptType.definition:
-                                            field_id = MemoryProvider.get_field_id (child.concept.name)
-                                        else:
-                                            field_id = child.concept.id
+                                        field_id = child.concept.id
+                                if child.type == PropositionTreeNodeType.code_object:
+                                    field_id = MemoryProvider.get_field_id (child.text)
                             #elif child.linkage.name == LanguageHelper.translate ("which"):
                             #    child = child.children[0]
                             #    if child.type == PropositionTreeNodeType.number:
@@ -884,12 +882,14 @@ class SemanticAnalyzer ():
                                                                 list_id = MemoryProvider.get_list_id (child1.concept.name)
                                                             else:
                                                                 list_id = child1.concept.id
+                                                    elif child1.type == PropositionTreeNodeType.code_object:
+                                                        list_id = MemoryProvider.get_list_id (child1.text)
                                                 elif child1.linkage.name == LanguageHelper.translate ("which"):
                                                     child1 = child1.children[0]
                                                     if child1.type == PropositionTreeNodeType.number:
                                                         element_id = int (child1.text)
-                                                    elif child1.type == PropositionTreeNodeType.concept:
-                                                        element_id = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child1.concept.name))
+                                                    elif child1.type == PropositionTreeNodeType.code_object:
+                                                        element_id = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child1.text))
                                             j += 1
                                         if list_id == 0:
                                             node = ContextProvider.get_list_node ()
@@ -900,10 +900,13 @@ class SemanticAnalyzer ():
                                             if node != None:
                                                 element_id = node.concept.id
                                     else:
-                                        if child.concept.type == TreeNodeConceptType.definition:
-                                            field_id = MemoryProvider.get_field_id (child.concept.name)
-                                        else:
-                                            field_id = child.concept.id
+                                        field_id = child.concept.id
+                                    if field_id != 0:
+                                        self.result += str (MemoryProvider.get_field_value (field_id))
+                                    elif list_id != 0 and element_id != 0:
+                                        self.result += str (MemoryProvider.get_list_element_value (list_id, element_id))
+                                if child.type == PropositionTreeNodeType.code_object:
+                                    field_id = MemoryProvider.get_field_id (child.text)
                                     if field_id != 0:
                                         self.result += str (MemoryProvider.get_field_value (field_id))
                                     elif list_id != 0 and element_id != 0:
@@ -1108,6 +1111,15 @@ class SemanticAnalyzer ():
                                     pass
                                 else:
                                     into_field_id = MemoryProvider.get_field_id (child.concept.name)
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.linkage:
+                                    if child.linkage.name == LanguageHelper.translate ("as-what"):
+                                        child = child.children[0]
+                                        if child.type == PropositionTreeNodeType.concept:
+                                            if child.concept.name == LanguageHelper.translate ("letter"):
+                                                into_type = 2
+                            elif child.type == PropositionTreeNodeType.code_object:
+                                into_field_id = MemoryProvider.get_field_id (child.text)
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.linkage:
                                     if child.linkage.name == LanguageHelper.translate ("as-what"):

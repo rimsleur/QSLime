@@ -108,16 +108,16 @@ class PropositionTree ():
 					if child1.type == PropositionTreeNodeType.linkage:
 						if child1.linkage.name == LanguageHelper.translate ("which"):
 							child2 = child1.children[0]
-							if child2.type == PropositionTreeNodeType.concept:
+							if child2.type == PropositionTreeNodeType.code_object:
 								if is_new == True:
-									result_node.concept.id = MemoryProvider.create_field (child2.concept.name)
+									result_node.concept.id = MemoryProvider.create_field (child2.text)
 									is_memobject = True
 									result_node.concept.type = TreeNodeConceptType.field
 									result_node.concept.name = "$" + str (result_node.concept.id)
 									result_node.text = result_node.concept.name
 									ContextProvider.set_field_node (result_node)
 								else:
-									result_node.concept.id = MemoryProvider.get_field_id (child2.concept.name)
+									result_node.concept.id = MemoryProvider.get_field_id (child2.text)
 									is_memobject = True
 									result_node.concept.type = TreeNodeConceptType.field
 									result_node.concept.name = "$" + str (result_node.concept.id)

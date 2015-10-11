@@ -156,6 +156,8 @@ class SyntaxAnalyzer ():
                 else:
                     cls.__error_text = ErrorHelper.get_text (102, token.text)
                     return False
+            elif token.text.find ('%') == 0 and len (token.text) > 1:
+                token.type = TokenType.code_object
             elif token.text.find ('*') == 0:
                 # Модификатор
                 token.type = TokenType.modifier
@@ -326,6 +328,8 @@ class SyntaxAnalyzer ():
                     node.type = PropositionTreeNodeType.number
                 elif tokens[i].type == TokenType.string:
                     node.type = PropositionTreeNodeType.string
+                elif tokens[i].type == TokenType.code_object:
+                    node.type = PropositionTreeNodeType.code_object
                 #print node.text
                 parent_node.children.append (node)
             i += 1

@@ -9,3 +9,4 @@ class PropositionTreeNodeType ():
 	underscore = 3
 	number = 4
 	string = 5
+	code_object = 6
