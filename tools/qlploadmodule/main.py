@@ -25,8 +25,13 @@ def main ():
 
 	module = None
 	line_count = 0
+	lines = []
+	procs = []
 
 	for line in sourse.readlines ():
+		lines.append (line)
+
+	for line in lines:
 		if line == "\n":
 			continue
 
@@ -46,6 +51,45 @@ def main ():
 				line = line[m+1:]
 				m = line.find (' ')
 				module = line[:m]
+
+				for line in lines:
+					tab_count = 0
+
+					for char in line:
+						if char == "\t":
+							tab_count += 1
+						else:
+							break
+
+					if tab_count == 1:
+						n = tab_count
+						m = line.find (' ')
+						word = line[n:m]
+						if word == "процедура":
+							line = line[m+1:]
+							m = line.find (' ')
+							procedure = line[:m]
+							if procedure != "":
+								procs.append (procedure)
+				if len (procs) > 0:
+					script.write ('\n')
+					script.write ('./qconcept -c 2 \'' + module + '\'\n')
+					script.write ('./qconcept -c 5\n')
+					script.write ('CONCEPT1=`./qconcept -m`\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем модуль"\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '"\n')
+					script.write ('./qconcept -c 7\n')
+					script.write ('CONCEPT2=`./qconcept -m`\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT2"\n')
+
+					line_count = 1
+
+					for proc in procs:
+						if line_count == 1:
+							script.write ('./qconcept -a $CONCEPT2 0 \'' + module + '.' + proc + '\'; PREVLINE=`./qconcept -g`\n')
+						else:
+							script.write ('./qconcept -a $CONCEPT2 $PREVLINE \'' + module + '.' + proc + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
+						line_count += 1
 
 		elif tab_count == 1:
 			if module == None:

@@ -29,6 +29,7 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('priority', 'RU', 'приоритет'),
 ('to-attach', 'RU', 'присоединять'),
 ('towards-what', 'RU', 'к-чему'),
+('module', 'RU', 'модуль'),
 ('procedure', 'RU', 'процедура'),
 ('list', 'RU', 'список'),
 ('element', 'RU', 'элемент'),
