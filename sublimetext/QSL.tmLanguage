@@ -38,6 +38,15 @@
 
 			<dict>
 				<key>comment</key>
+				<string>Программный объект</string>
+				<key>match</key>
+				<string>\%(\w|\-)*</string>
+				<key>name</key>
+				<string>object</string>
+			</dict>
+
+			<dict>
+				<key>comment</key>
 				<string>Понятие действия</string>
 				<key>match</key>
 				<string>\w*(ать|ять|еть)\b</string>

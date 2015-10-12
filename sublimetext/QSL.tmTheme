@@ -76,6 +76,16 @@
 
 			<dict>
 				<key>scope</key>
+				<string>object</string>
+				<key>settings</key>
+				<dict>
+					<key>foreground</key>
+					<string>#DEF6FA</string>
+				</dict>
+			</dict>
+
+			<dict>
+				<key>scope</key>
 				<string>concept.action</string>
 				<key>settings</key>
 				<dict>
