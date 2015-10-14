@@ -44,8 +44,8 @@ class SyntaxAnalyzer ():
                     word = []
             elif letter == "(" or \
                  letter == ")" or \
-                 letter == "," or \
-                 letter == "_":
+                 letter == ",":
+                 #letter == "_":
                 if len (word) > 0:
                     token = Token ()
                     token.text = ''.join (word)
@@ -54,7 +54,8 @@ class SyntaxAnalyzer ():
                 token = Token ()
                 token.text = letter
                 tokens.append (token)
-            elif letter == ".":
+            elif letter == "." or \
+                 letter == "_":
                 j = i + 1
                 if j == len (text):
                     if len (word) > 0:
@@ -68,9 +69,12 @@ class SyntaxAnalyzer ():
                 while j < len (text):
                     letter = text[j]
 
-                    if letter == " " or \
-                       letter == ")" or \
-                       letter == "(":
+                    if letter == " ":
+                        break
+                    elif letter == ")" or \
+                         letter == "(" or \
+                         letter == ",":
+                        j = j - 1
                         break
                     if i == (j - 1):
                         if letter == " ":

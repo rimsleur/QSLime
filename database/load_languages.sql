@@ -10,6 +10,7 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('which', 'RU', 'какой'),
 ('to-create', 'RU', 'создавать'),
 ('field', 'RU', 'поле'),
+('constant', 'RU', 'константа'),
 ('to-set', 'RU', 'устанавливать'),
 ('value', 'RU', 'значение'),
 ('of-what', 'RU', 'чего'),

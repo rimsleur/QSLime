@@ -256,6 +256,7 @@ class SemanticAnalyzer ():
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-set"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
                     field_id = 0
+                    constant_id = 0
                     list_id = 0
                     element_id = 0
                     new_value = None
@@ -301,6 +302,10 @@ class SemanticAnalyzer ():
                                             node = ContextProvider.get_element_node ()
                                             if node != None:
                                                 element_id = node.concept.id
+                                    elif child.concept.name == LanguageHelper.translate ("constant"):
+                                        node = ContextProvider.get_constant_node ()
+                                        if node != None:
+                                            constant_id = node.concept.id
                                     else:
                                         field_id = child.concept.id
                                 elif child.type == PropositionTreeNodeType.code_object:
@@ -326,7 +331,13 @@ class SemanticAnalyzer ():
                                     else:
                                         new_value = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.concept.name))
                                 elif child.type == PropositionTreeNodeType.code_object:
-                                    new_value = MemoryProvider.get_field_value (MemoryProvider.get_field_id (child.text))
+                                    id = MemoryProvider.get_field_id (child.text)
+                                    if id != None:
+                                        new_value = MemoryProvider.get_field_value (id)
+                                    else:
+                                        id = MemoryProvider.get_constant_id (child.text)
+                                        if id != None:
+                                            new_value = MemoryProvider.get_constant_value (id)
                         i += 1
                     if field_id != 0:
                         if new_value != None:
@@ -350,7 +361,9 @@ class SemanticAnalyzer ():
                             #TriggerProvider.process_object_triggers (trigger_key)
                             #trigger_key = str (list_id) + "[" + str (element_id) + "]=" + str (new_value)
                             #TriggerProvider.process_object_triggers (trigger_key)
-
+                    elif constant_id != 0:
+                        if new_value != None:
+                            MemoryProvider.set_constant_value (constant_id, new_value)
                 elif actant.concept.name == LanguageHelper.translate ("handler"):
                     handler_variables = HandlerVariables ()
                     trigger_id = 0
@@ -971,6 +984,8 @@ class SemanticAnalyzer ():
                                                 child = child.children[0]
                                                 if child.type == PropositionTreeNodeType.number:
                                                     field_value = child.text
+                                                elif child.type == PropositionTreeNodeType.code_object:
+                                                    field_value = MemoryProvider.get_constant_value (MemoryProvider.get_constant_id (child.text))
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.string:

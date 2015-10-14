@@ -58,7 +58,7 @@
 				<key>comment</key>
 				<string>Понятие определения</string>
 				<key>match</key>
-				<string>\b(поле|список|элемент|имя|приоритет|значение|изменение|число|буква)\b</string>
+				<string>\b(поле|константа|список|элемент|имя|приоритет|значение|изменение|число|буква)\b</string>
 				<key>name</key>
 				<string>concept.definition</string>
 			</dict>

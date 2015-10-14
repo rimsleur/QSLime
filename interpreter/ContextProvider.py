@@ -8,6 +8,7 @@ class ContextProvider ():
 	@classmethod
 	def __init__ (cls):
 		cls.__field_node = None
+		cls.__constant_node = None
 		cls.__actor_node = None
 		cls.__trigger_node = None
 		cls.__condition_node = None
@@ -21,6 +22,14 @@ class ContextProvider ():
 	@classmethod
 	def get_field_node (cls):
 		return cls.__field_node
+
+	@classmethod
+	def set_constant_node (cls, node):
+		cls.__constant_node = node
+
+	@classmethod
+	def get_constant_node (cls):
+		return cls.__constant_node
 
 	@classmethod
 	def set_actor_node (cls, node):

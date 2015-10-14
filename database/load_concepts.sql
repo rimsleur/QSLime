@@ -21,6 +21,7 @@ INSERT INTO `qsl_concept` (`id`, `type`, `name`, `timestamp`) VALUES
 (NULL, 2, 'модуль', NULL),
 (NULL, 2, 'процедура', NULL),
 (NULL, 2, 'поле', NULL),
+(NULL, 2, 'константа', NULL),
 (NULL, 2, 'элемент', NULL),
 (NULL, 2, 'список', NULL),
 (NULL, 2, 'ссылка', NULL),

@@ -122,6 +122,25 @@ class PropositionTree ():
 									result_node.concept.type = TreeNodeConceptType.field
 									result_node.concept.name = "$" + str (result_node.concept.id)
 									result_node.text = result_node.concept.name
+				if actor.concept.name == LanguageHelper.translate ("constant"):
+					child1 = actant.children[0]
+					if child1.type == PropositionTreeNodeType.linkage:
+						if child1.linkage.name == LanguageHelper.translate ("which"):
+							child2 = child1.children[0]
+							if child2.type == PropositionTreeNodeType.code_object:
+								if is_new == True:
+									result_node.concept.id = MemoryProvider.create_constant (child2.text)
+									is_memobject = True
+									result_node.concept.type = TreeNodeConceptType.constant
+									result_node.concept.name = "$" + str (result_node.concept.id)
+									result_node.text = result_node.concept.name
+									ContextProvider.set_constant_node (result_node)
+								else:
+									result_node.concept.id = MemoryProvider.get_constant_id (child2.text)
+									is_memobject = True
+									result_node.concept.type = TreeNodeConceptType.constant
+									result_node.concept.name = "$" + str (result_node.concept.id)
+									result_node.text = result_node.concept.name
 				elif actor.concept.name == LanguageHelper.translate ("list"):
 					child1 = actant.children[0]
 					if child1.type == PropositionTreeNodeType.linkage:
@@ -141,7 +160,7 @@ class PropositionTree ():
 									result_node.concept.type = TreeNodeConceptType.memlist
 									result_node.concept.name = "$" + str (result_node.concept.id)
 									result_node.text = result_node.concept.name
-				if actor.concept.name == LanguageHelper.translate ("condition"):
+				elif actor.concept.name == LanguageHelper.translate ("condition"):
 					child1 = actant.children[0]
 					if child1.type == PropositionTreeNodeType.linkage:
 						if child1.linkage.name == LanguageHelper.translate ("which"):

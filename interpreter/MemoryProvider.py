@@ -15,6 +15,11 @@ class MemoryProvider ():
 		cls.__last_field_index = 0
 		cls.__field_name_dict = {}
 
+		cls.__constants = []
+		cls.__constants.append (None)
+		cls.__last_constant_index = 0
+		cls.__constant_name_dict = {}
+
 		cls.__lists = []
 		cls.__lists.append (None)
 		cls.__last_list_index = 0
@@ -38,7 +43,6 @@ class MemoryProvider ():
 
 	@classmethod
 	def get_field_id (cls, name):
-		#print cls.__field_name_dict.values ()
 		return cls.__field_name_dict.get (name)
 
 	@classmethod
@@ -52,6 +56,29 @@ class MemoryProvider ():
 	@classmethod
 	def print_all_fields (cls):
 		print cls.__field_name_dict.items ()
+
+	@classmethod
+	def create_constant (cls, name):
+		id = cls.get_constant_id (name)
+		if id != None:
+			return id
+		else:
+			cls.__constants.append (None)
+			cls.__last_constant_index += 1
+			cls.__constant_name_dict[name] = cls.__last_constant_index
+			return cls.__last_constant_index
+
+	@classmethod
+	def get_constant_id (cls, name):
+		return cls.__constant_name_dict.get (name)
+
+	@classmethod
+	def get_constant_value (cls, id):
+		return cls.__constants[id]
+
+	@classmethod
+	def set_constant_value (cls, id, value):
+		cls.__constants[id] = value
 
 	@classmethod
 	def create_list (cls, name):

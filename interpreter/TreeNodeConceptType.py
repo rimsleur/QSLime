@@ -16,3 +16,4 @@ class TreeNodeConceptType ():
     condition = 10
     memlist = 11
     element = 12
+    constant = 13
