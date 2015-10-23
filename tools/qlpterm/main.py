@@ -14,7 +14,7 @@ reload (sys)
 
 def main ():
 	exit = False
-	pipein = open("/tmp/qlpterm-tube", "r")
+	pipein = open("/tmp/qlp-std-out", "r")
 
 	screen = curses.initscr()
 	screen.clear ()

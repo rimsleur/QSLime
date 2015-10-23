@@ -20,7 +20,7 @@ from PropositionTree import PropositionTree
 
 reload (sys)
 
-def main (single_run, text):
+def main (single_run, use_dbg, text):
     exit = False
     db = MySQLdb.connect (host="localhost", user="qslbase", passwd="qslbase", db="qslbase", charset="utf8")
     cursor = db.cursor ()
@@ -37,8 +37,12 @@ def main (single_run, text):
     ConditionProvider ()
 
     if single_run == False:
-        pipein = os.open("/tmp/qlp-tube", os.O_RDONLY | os.O_NONBLOCK)
-        pipeout = os.open("/tmp/qlpterm-tube", os.O_WRONLY)
+        stdin = os.open("/tmp/qlp-std-in", os.O_RDONLY | os.O_NONBLOCK)
+        stdout = os.open("/tmp/qlp-std-out", os.O_WRONLY)
+
+    if use_dbg == True:
+        dbgin = os.open("/tmp/qlp-dbg-in", os.O_RDONLY | os.O_NONBLOCK)
+        dbgout = os.open("/tmp/qlp-dbg-out", os.O_WRONLY)
 
     #print text
     if SyntaxAnalyzer.analize (text):
@@ -85,23 +89,26 @@ def main (single_run, text):
 
             if result != "" and single_run == False:
                 #print result
-                os.write (pipeout, result)
+                os.write (stdout, result)
                 result = ""
                 exit = True
 
         if single_run == True:
             return result
 
-    os.close (pipeout)
-    os.close (pipein)
+    os.close (stdout)
+    os.close (stdin)
 
 single_run = False
+use_dbg = False
 for arg in sys.argv:
     if arg == "-1":
         single_run = True
+    elif arg == "-d":
+        use_dbg = True
     else:
         text = arg
 if single_run == True:
-    print main(single_run, text)
+    print main (single_run, use_dbg, text)
 else:
-    main(single_run, text)
+    main (single_run, use_dbg, text)
