@@ -24,7 +24,12 @@ class MainVSplitter (QtGui.QSplitter):
 		self.addWidget (history_viewer)
 
 		vbox_layout = VBoxLayout (main_window)
-		#self.addWidget (vbox_layout)
-		#self.setLayout (vbox_layout)
+		frame = QtGui.QFrame ()
+		frame.setLayout (vbox_layout)
+		frame.setContentsMargins (-10,-10,-10,-10)
+		self.addWidget (frame)
+
+		self.setStretchFactor (0, 3)
+		self.setStretchFactor (1, 1)
 
 		self.resize (800, 600)

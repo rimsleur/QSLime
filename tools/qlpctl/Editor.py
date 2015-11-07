@@ -2,7 +2,7 @@
 # coding: utf8
 
 """
-Окно просмотра истории
+Редактор команд
 """
 
 import sys
@@ -15,5 +15,3 @@ class Editor (QtGui.QTextEdit):
 
 		main_window.editor = self
 		self.main_window = main_window
-
-		#self.setReadOnly (True)
