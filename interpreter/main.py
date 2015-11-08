@@ -20,7 +20,7 @@ from PropositionTree import PropositionTree
 
 reload (sys)
 
-def main (single_run, use_dbg, text):
+def main (single_run, use_ctl, use_dbg, text):
     exit = False
     db = MySQLdb.connect (host="localhost", user="qslbase", passwd="qslbase", db="qslbase", charset="utf8")
     cursor = db.cursor ()
@@ -37,23 +37,39 @@ def main (single_run, use_dbg, text):
     ConditionProvider ()
 
     if single_run == False:
-        stdin = os.open("/tmp/qlp-std-in", os.O_RDONLY | os.O_NONBLOCK)
-        stdout = os.open("/tmp/qlp-std-out", os.O_WRONLY)
-
+        stdin = os.open ("/tmp/qlp-std-in", os.O_RDONLY | os.O_NONBLOCK)
+        stdout = os.open ("/tmp/qlp-std-out", os.O_WRONLY)
+    if use_ctl == True:
+        ctlout = os.open ("/tmp/qlp-ctl-out", os.O_WRONLY)
+        ctlin = open ("/tmp/qlp-ctl-in", "r")
     if use_dbg == True:
-        dbgin = os.open("/tmp/qlp-dbg-in", os.O_RDONLY | os.O_NONBLOCK)
-        dbgout = os.open("/tmp/qlp-dbg-out", os.O_WRONLY)
+        dbgin = os.open ("/tmp/qlp-dbg-in", os.O_RDONLY | os.O_NONBLOCK)
+        dbgout = os.open ("/tmp/qlp-dbg-out", os.O_WRONLY)
 
-    #print text
-    if SyntaxAnalyzer.analize (text):
-        #syntax_analyzer.proposition_tree.print_tree ()
-        if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
-            #semantic_analyzer.proposition_tree.print_tree ()
-            result += semantic_analyzer.result
-        else:
-            return semantic_analyzer.get_error_text ()
+    if use_ctl == True:
+        text = ctlin.readline ()
+        if text != "":
+            if SyntaxAnalyzer.analize (text):
+                #PropositionTree.print_tree (SyntaxAnalyzer.proposition_tree)
+                if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
+                    #semantic_analyzer.proposition_tree.print_tree ()
+                    result += semantic_analyzer.result
+                    os.write (ctlout, 'OK.\n')
+                else:
+                    os.write (ctlout, semantic_analyzer.get_error_text () + '\n')
+            else:
+                os.write (ctlout, semantic_analyzer.get_error_text () + '\n')
     else:
-        return SyntaxAnalyzer.get_error_text ()
+        if text != "":
+            if SyntaxAnalyzer.analize (text):
+                #syntax_analyzer.proposition_tree.print_tree ()
+                if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
+                    #semantic_analyzer.proposition_tree.print_tree ()
+                    result += semantic_analyzer.result
+                else:
+                    return semantic_analyzer.get_error_text ()
+            else:
+                return SyntaxAnalyzer.get_error_text ()
 
     while (exit != True):
         code_line = CodeStack.pop ()
@@ -96,19 +112,30 @@ def main (single_run, use_dbg, text):
         if single_run == True:
             return result
 
-    os.close (stdout)
     os.close (stdin)
+    os.close (stdout)
+    os.close (ctlin)
+    os.close (ctlout)
+    os.close (dbgin)
+    os.close (dbgout)
+
 
 single_run = False
+use_ctl = False
 use_dbg = False
+text = ""
+argi = 0
 for arg in sys.argv:
+    argi += 1
     if arg == "-1":
         single_run = True
+    elif arg == "-c":
+        use_ctl = True
     elif arg == "-d":
         use_dbg = True
-    else:
+    elif argi > 1:
         text = arg
 if single_run == True:
-    print main (single_run, use_dbg, text)
+    print main (single_run, use_ctl, use_dbg, text)
 else:
-    main (single_run, use_dbg, text)
+    main (single_run, use_ctl, use_dbg, text)

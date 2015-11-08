@@ -15,3 +15,5 @@ class Editor (QtGui.QTextEdit):
 
 		main_window.editor = self
 		self.main_window = main_window
+
+		self.append (u'ты ?кто выполнять ?что (=процедура ?что иметь ?что имя ?какой Snake.Init).')

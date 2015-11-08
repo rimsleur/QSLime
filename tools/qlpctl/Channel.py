@@ -16,17 +16,16 @@ class Channel ():
 		self.pipeout = None
 
 	def open (self):
-		self.pipein = os.open ("/tmp/qlp-ctl-out", os.O_RDONLY | os.O_NONBLOCK)
+		self.pipein = open ("/tmp/qlp-ctl-out", 'r')
 		self.pipeout = os.open ("/tmp/qlp-ctl-in", os.O_WRONLY)
 
 	def send (self, text):
-		print text
+		os.write (self.pipeout, (text + u'\n').encode("utf-8"))
 
 	def receive (self):
-		text = "OK"
-		text = u"<b>система:</b> " + text
+		text = u"<b>система:</b> " + self.pipein.readline ()
 		return text
 
 	def close (self):
-		os.close (self.pipeout)
 		os.close (self.pipein)
+		os.close (self.pipeout)
