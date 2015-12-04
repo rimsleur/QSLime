@@ -4,7 +4,7 @@
 
 		<key>fileTypes</key>
 		<array>
-			<string>qsl</string>
+			<string>qslm</string>
 		</array>
 		
 		<key>patterns</key>
