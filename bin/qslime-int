@@ -1,5 +1,5 @@
 #! /bin/bash
 
-./qslime-create-pipes.sh
+./qslime-create-pipes
 
 ./../interpreter/main.py -c
