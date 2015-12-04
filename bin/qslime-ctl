@@ -1,0 +1,3 @@
+#! /bin/bash
+
+./../controller/main.py

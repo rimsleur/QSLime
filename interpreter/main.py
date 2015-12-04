@@ -37,15 +37,15 @@ def main (single_run, use_ctl, use_dbg, text):
     ConditionProvider ()
 
     if single_run == False:
-        stdin = os.open ("/tmp/qlp-std-in", os.O_RDONLY | os.O_NONBLOCK)
-        stdout = os.open ("/tmp/qlp-std-out", os.O_WRONLY)
+        stdin = os.open ("/tmp/qslime-std-in", os.O_RDONLY | os.O_NONBLOCK)
+        stdout = os.open ("/tmp/qslime-std-out", os.O_WRONLY)
     if use_ctl == True:
-        ctlout = os.open ("/tmp/qlp-ctl-out", os.O_WRONLY)
-        ctlin = open ("/tmp/qlp-ctl-in", "r")
+        ctlout = os.open ("/tmp/qslime-ctl-out", os.O_WRONLY)
+        ctlin = open ("/tmp/qslime-ctl-in", "r")
     if use_dbg == True:
-        dbgin = os.open ("/tmp/qlp-dbg-in", os.O_RDONLY | os.O_NONBLOCK)
-        dbgout = os.open ("/tmp/qlp-dbg-out", os.O_WRONLY)
-
+        #dbgout = os.open ("/tmp/qslime-dbg-out", os.O_WRONLY)
+        #dbgin = open ("/tmp/qslime-dbg-in", "r")
+        pass
     if use_ctl == True:
         text = ctlin.readline ()
         if text != "":
@@ -118,7 +118,6 @@ def main (single_run, use_ctl, use_dbg, text):
     os.close (ctlout)
     os.close (dbgin)
     os.close (dbgout)
-
 
 single_run = False
 use_ctl = False

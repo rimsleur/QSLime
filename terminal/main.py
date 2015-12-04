@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding: utf8
 """
-Программа-терминал для взаимодействия с QLP
+Программа-терминал для взаимодействия с интерпретатором
 Точка входа
 """
 
@@ -14,7 +14,7 @@ reload (sys)
 
 def main ():
 	exit = False
-	pipein = open("/tmp/qlp-std-out", "r")
+	pipein = open("/tmp/qslime-std-out", "r")
 
 	screen = curses.initscr()
 	screen.clear ()

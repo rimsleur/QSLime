@@ -16,8 +16,8 @@ class Channel ():
 		self.pipeout = None
 
 	def open (self):
-		self.pipein = open ("/tmp/qlp-ctl-out", 'r')
-		self.pipeout = os.open ("/tmp/qlp-ctl-in", os.O_WRONLY)
+		self.pipein = open ("/tmp/qslime-ctl-out", 'r')
+		self.pipeout = os.open ("/tmp/qslime-ctl-in", os.O_WRONLY)
 
 	def send (self, text):
 		os.write (self.pipeout, (text + u'\n').encode("utf-8"))

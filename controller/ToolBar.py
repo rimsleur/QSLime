@@ -16,7 +16,7 @@ class ToolBar (QtGui.QToolBar):
 		main_window.toolbar = self
 		self.main_window = main_window
 
-		self.action_connect = QtGui.QAction (QtGui.QIcon ('qlpctl/icons/enter.png'), u'Отправить', self)
+		self.action_connect = QtGui.QAction (QtGui.QIcon ('../controller/icons/enter.png'), u'Отправить', self)
 		self.addAction (self.action_connect)
 		self.connect (self.action_connect, QtCore.SIGNAL ('triggered()'), self.action_on_send)
 

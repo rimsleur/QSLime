@@ -1,0 +1,27 @@
+#! /bin/bash
+
+DIR="/tmp"
+
+if [ ! -e $DIR/qslime-std-in ];
+then mkfifo $DIR/qslime-std-in;
+fi
+
+if [ ! -e $DIR/qslime-std-out ];
+then mkfifo $DIR/qslime-std-out;
+fi
+
+if [ ! -e $DIR/qslime-ctl-in ];
+then mkfifo $DIR/qslime-ctl-in;
+fi
+
+if [ ! -e $DIR/qslime-ctl-out ];
+then mkfifo $DIR/qslime-ctl-out;
+fi
+
+if [ ! -e $DIR/qslime-dbg-in ];
+then mkfifo $DIR/qslime-dbg-in;
+fi
+
+if [ ! -e $DIR/qslime-dbg-out ];
+then mkfifo $DIR/qslime-dbg-out;
+fi

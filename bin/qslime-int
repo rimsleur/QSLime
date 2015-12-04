@@ -1,0 +1,5 @@
+#! /bin/bash
+
+./qslime-create-pipes.sh
+
+./../interpreter/main.py -c
