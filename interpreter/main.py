@@ -17,6 +17,7 @@ from TriggerProvider import TriggerProvider
 from ConditionProvider import ConditionProvider
 from CodeProvider import CodeProvider
 from PropositionTree import PropositionTree
+from DebuggerProvider import DebuggerProvider
 
 reload (sys)
 
@@ -35,6 +36,7 @@ def main (single_run, use_ctl, use_dbg, text):
     ContextProvider ()
     TriggerProvider ()
     ConditionProvider ()
+    DebuggerProvider ()
 
     if single_run == False:
         stdin = os.open ("/tmp/qslime-std-in", os.O_RDONLY | os.O_NONBLOCK)
@@ -43,9 +45,10 @@ def main (single_run, use_ctl, use_dbg, text):
         ctlout = os.open ("/tmp/qslime-ctl-out", os.O_WRONLY)
         ctlin = open ("/tmp/qslime-ctl-in", "r")
     if use_dbg == True:
-        #dbgout = os.open ("/tmp/qslime-dbg-out", os.O_WRONLY)
-        #dbgin = open ("/tmp/qslime-dbg-in", "r")
-        pass
+        dbgout = os.open ("/tmp/qslime-dbg-out", os.O_WRONLY)
+        dbgin = open ("/tmp/qslime-dbg-in", "r")
+        DebuggerProvider.dbgin = dbgin
+        DebuggerProvider.dbgout = dbgout
     if use_ctl == True:
         text = ctlin.readline ()
         if text != "":
@@ -61,6 +64,7 @@ def main (single_run, use_ctl, use_dbg, text):
                 os.write (ctlout, semantic_analyzer.get_error_text () + '\n')
     else:
         if text != "":
+            os.write (dbgout, (text + u'\n').encode ("utf-8"))
             if SyntaxAnalyzer.analize (text):
                 #syntax_analyzer.proposition_tree.print_tree ()
                 if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
