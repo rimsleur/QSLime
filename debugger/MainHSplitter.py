@@ -2,7 +2,7 @@
 # coding: utf8
 
 """
-Главный горизонтальный разделитель
+Главный горизонтальный изменяемый разделитель
 """
 
 import sys
@@ -12,8 +12,8 @@ from TabContainer import TabContainer
 
 class MainHSplitter (QtGui.QSplitter):
 
-	def __init__ (self, main_window, central_widget):
-		QtGui.QSplitter.__init__ (self, central_widget)
+	def __init__ (self, main_window):
+		QtGui.QSplitter.__init__ (self)
 
 		main_window.main_hsplitter = self
 		self.main_window = main_window
@@ -25,4 +25,5 @@ class MainHSplitter (QtGui.QSplitter):
 		tab_container = TabContainer (main_window)
 		self.addWidget (tab_container)
 
-		self.resize (1000, 500)
+		self.setStretchFactor (0, 3)
+		self.setStretchFactor (1, 1)

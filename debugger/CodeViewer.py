@@ -17,3 +17,5 @@ class CodeViewer (QtGui.QTextEdit):
 		self.main_window = main_window
 
 		self.setReadOnly (True)
+
+		self.setViewportMargins (20, 0, 0, 0);

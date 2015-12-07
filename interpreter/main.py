@@ -64,7 +64,10 @@ def main (single_run, use_ctl, use_dbg, text):
                 os.write (ctlout, semantic_analyzer.get_error_text () + '\n')
     else:
         if text != "":
-            os.write (dbgout, (text + u'\n').encode ("utf-8"))
+            DebuggerProvider.reset ()
+            DebuggerProvider.append_code_line (text)
+            data = DebuggerProvider.build_debug_data ()
+            os.write (dbgout, (data + u'\n').encode ("utf-8"))
             if SyntaxAnalyzer.analize (text):
                 #syntax_analyzer.proposition_tree.print_tree ()
                 if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
