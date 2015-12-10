@@ -66,8 +66,9 @@ def main (single_run, use_ctl, use_dbg, text):
         if text != "":
             DebuggerProvider.reset ()
             DebuggerProvider.append_code_line (text)
-            data = DebuggerProvider.build_debug_data ()
-            os.write (dbgout, (data + u'\n').encode ("utf-8"))
+            DebuggerProvider.build_debug_data ()
+            DebuggerProvider.send_data ()
+            DebuggerProvider.receive_data ()
             if SyntaxAnalyzer.analize (text):
                 #syntax_analyzer.proposition_tree.print_tree ()
                 if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
@@ -82,6 +83,10 @@ def main (single_run, use_ctl, use_dbg, text):
         code_line = CodeStack.pop ()
         while (code_line != None):
             #print code_line.text
+            print code_line.id, code_line.concept_id, code_line.prev_line_id
+            DebuggerProvider.build_debug_data ()
+            DebuggerProvider.send_data ()
+            DebuggerProvider.receive_data ()
             analized = True
             if code_line.tree == None:
                 analized = SyntaxAnalyzer.analize (code_line.text)

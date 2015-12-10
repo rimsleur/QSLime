@@ -7,6 +7,7 @@
 
 import sys
 from PyQt4 import QtCore, QtGui
+from DebugDataProvider import DebugDataProvider
 
 class ToolBar (QtGui.QToolBar):
 
@@ -53,16 +54,24 @@ class ToolBar (QtGui.QToolBar):
 		self.main_window.close ()
 
 	def action_on_step_over (self):
-		self.main_window.close ()
+		DebugDataProvider.set_step_type (DebugDataProvider.STEP_TYPE_STEP_OVER)
+		DebugDataProvider.send_data ()
+		DebugDataProvider.receive_data ()
+		#DebugDataProvider.update_code_text ()
 
 	def action_on_step_into_procedure (self):
-		self.main_window.close ()
+
+		DebugDataProvider.set_step_type (DebugDataProvider.STEP_TYPE_STEP_INTO_PROCEDURE)
+		DebugDataProvider.send_data ()
 
 	def action_on_step_into_module (self):
-		self.main_window.close ()
+		DebugDataProvider.set_step_type (DebugDataProvider.STEP_TYPE_STEP_INTO_MODULE)
+		DebugDataProvider.send_data ()
 
 	def action_on_step_out_procedure (self):
-		self.main_window.close ()
+		DebugDataProvider.set_step_type (DebugDataProvider.STEP_TYPE_STEP_OUT_PROCEDURE)
+		DebugDataProvider.send_data ()
 
 	def action_on_step_out_module (self):
-		self.main_window.close ()
+		DebugDataProvider.set_step_type (DebugDataProvider.STEP_TYPE_STEP_OUT_MODULE)
+		DebugDataProvider.send_data ()
