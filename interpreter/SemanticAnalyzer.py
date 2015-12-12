@@ -27,6 +27,9 @@ from ConditionProvider import ConditionProvider
 from CodeProvider import CodeProvider
 from SyntaxAnalyzer import SyntaxAnalyzer
 from HandlerVariables import HandlerVariables
+from DebuggerProvider import DebuggerProvider
+from DebuggerProcedure import DebuggerProcedure
+from DebuggerCodeLine import DebuggerCodeLine
 
 class SemanticAnalyzer ():
 
@@ -45,7 +48,7 @@ class SemanticAnalyzer ():
         if code_line != None:
             if code_line.concept_id != 0:
                 if code_line.concept_id == CodeProvider.get_initial_procedure ():
-                    database_list = DatabaseList.read (self.__cursor, code_line.concept_id, code_line.id)
+                    database_list = DatabaseList.read_single (self.__cursor, code_line.concept_id, code_line.id)
                     if database_list != None:
                         code_line = CodeLine ()
                         code_line.id = database_list.id
@@ -203,7 +206,7 @@ class SemanticAnalyzer ():
                     if list_concept_id == 0:
                         self.__error_text = ErrorHelper.get_text (106)
                         return False
-                    database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
+                    database_list = DatabaseList.read_single (self.__cursor, list_concept_id, 0)
                     if database_list == None:
                         self.__error_text = ErrorHelper.get_text (106)
                         return False
@@ -215,6 +218,18 @@ class SemanticAnalyzer ():
                     CodeStack.push (code_line)
                     CodeStack.inside_procedure = True
                     CodeProvider.set_initial_procedure (database_list.concept_id)
+                    if DebuggerProvider.use == True:
+                        database_list = DatabaseList.read (self.__cursor, list_concept_id)
+                        dbg_procedure = DebuggerProcedure (list_concept_id, actant.concept.name)
+                        i = 1
+                        for line in database_list:
+                            dbg_code_line = DebuggerCodeLine ()
+                            dbg_code_line.internal_id = i
+                            dbg_code_line.external_id = line.id
+                            dbg_code_line.text = line.text
+                            dbg_procedure.append_line (dbg_code_line)
+                            i += 1
+                        DebuggerProvider.register_procedure (dbg_procedure)
                 else:
                     if CodeProvider.is_procedure_already_loaded (actant.concept.id) == False:
                         database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
@@ -246,7 +261,7 @@ class SemanticAnalyzer ():
                         if list_concept_id == 0:
                             self.__error_text = ErrorHelper.get_text (106)
                             return False
-                        database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
+                        database_list = DatabaseList.read_single (self.__cursor, list_concept_id, 0)
                         if database_list == None:
                             self.__error_text = ErrorHelper.get_text (106)
                             return False
@@ -465,7 +480,7 @@ class SemanticAnalyzer ():
                         if list_concept_id == 0:
                             self.__error_text = ErrorHelper.get_text (106)
                             return False
-                        database_list = DatabaseList.read (self.__cursor, list_concept_id, 0)
+                        database_list = DatabaseList.read_single (self.__cursor, list_concept_id, 0)
                         if database_list == None:
                             self.__error_text = ErrorHelper.get_text (106)
                             return False

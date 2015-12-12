@@ -57,7 +57,7 @@ class ToolBar (QtGui.QToolBar):
 		DebugDataProvider.set_step_type (DebugDataProvider.STEP_TYPE_STEP_OVER)
 		DebugDataProvider.send_data ()
 		DebugDataProvider.receive_data ()
-		#DebugDataProvider.update_code_text ()
+		DebugDataProvider.update_code_text ()
 
 	def action_on_step_into_procedure (self):
 

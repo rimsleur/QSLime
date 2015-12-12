@@ -36,7 +36,7 @@ def main (single_run, use_ctl, use_dbg, text):
     ContextProvider ()
     TriggerProvider ()
     ConditionProvider ()
-    DebuggerProvider ()
+    DebuggerProvider (use_dbg)
 
     if single_run == False:
         stdin = os.open ("/tmp/qslime-std-in", os.O_RDONLY | os.O_NONBLOCK)
@@ -64,11 +64,12 @@ def main (single_run, use_ctl, use_dbg, text):
                 os.write (ctlout, semantic_analyzer.get_error_text () + '\n')
     else:
         if text != "":
-            DebuggerProvider.reset ()
-            DebuggerProvider.append_code_line (text)
-            DebuggerProvider.build_debug_data ()
-            DebuggerProvider.send_data ()
-            DebuggerProvider.receive_data ()
+            if DebuggerProvider.use == True:
+                DebuggerProvider.reset ()
+                DebuggerProvider.set_single_code_line (text)
+                DebuggerProvider.build_debug_data ()
+                DebuggerProvider.send_data ()
+                DebuggerProvider.receive_data ()
             if SyntaxAnalyzer.analize (text):
                 #syntax_analyzer.proposition_tree.print_tree ()
                 if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
@@ -83,10 +84,12 @@ def main (single_run, use_ctl, use_dbg, text):
         code_line = CodeStack.pop ()
         while (code_line != None):
             #print code_line.text
-            print code_line.id, code_line.concept_id, code_line.prev_line_id
-            DebuggerProvider.build_debug_data ()
-            DebuggerProvider.send_data ()
-            DebuggerProvider.receive_data ()
+            if DebuggerProvider.use == True:
+                DebuggerProvider.set_procedure_id (code_line.concept_id)
+                DebuggerProvider.set_line_id (code_line.id)
+                DebuggerProvider.build_debug_data ()
+                DebuggerProvider.send_data ()
+                DebuggerProvider.receive_data ()
             analized = True
             if code_line.tree == None:
                 analized = SyntaxAnalyzer.analize (code_line.text)

@@ -4,6 +4,7 @@
 """
 
 import json
+from PyQt4 import QtGui
 
 class DebugDataProvider ():
 
@@ -20,6 +21,9 @@ class DebugDataProvider ():
 		cls.main_window = main_window
 		cls.debug_data = None
 		cls.step_type = 0
+		cls.previous_procedure_id = None
+		cls.current_procedure_id = None
+		cls.current_line_id = 0
 
 	@classmethod
 	def receive_data (cls):
@@ -29,7 +33,9 @@ class DebugDataProvider ():
 			code_lines = cls.debug_data.get ('code_lines')
 			if code_lines != None:
 				cls.code_lines = code_lines
-			cls.current_line = cls.debug_data.get ('current_line')
+			cls.previous_procedure_id = cls.current_procedure_id
+			cls.current_procedure_id = cls.debug_data.get ('current_procedure_id')
+			cls.current_line_id = cls.debug_data.get ('current_line_id')
 
 	@classmethod
 	def send_data (cls):
@@ -46,11 +52,18 @@ class DebugDataProvider ():
 	@classmethod
 	def update_code_text (cls):
 		if cls.debug_data != None and cls.code_lines != None:
+			scrollbar = cls.main_window.code_viewer.verticalScrollBar ()
+			if cls.current_procedure_id == cls.previous_procedure_id:
+				scroll = scrollbar.value ()
+			else:
+				scroll = 0
 			cls.main_window.code_viewer.clear ()
 			i = 1
 			for code_line in cls.code_lines:
-				if cls.current_line == i:
-					cls.main_window.code_viewer.append ('<b>' + code_line + '</b>\n')
+				if cls.current_line_id == i:
+					cls.main_window.code_viewer.append ('<b>' + code_line + '</b>')
 				else:
-					cls.main_window.code_viewer.append (code_line + '\n')
+					cls.main_window.code_viewer.append (code_line)
 				i += 1
+
+			scrollbar.setValue (scroll)
