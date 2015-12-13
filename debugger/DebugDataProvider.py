@@ -24,6 +24,7 @@ class DebugDataProvider ():
 		cls.previous_procedure_id = None
 		cls.current_procedure_id = None
 		cls.current_line_id = 0
+		cls.code_lines = []
 
 	@classmethod
 	def receive_data (cls):
@@ -32,7 +33,10 @@ class DebugDataProvider ():
 		if cls.debug_data != None:
 			code_lines = cls.debug_data.get ('code_lines')
 			if code_lines != None:
-				cls.code_lines = code_lines
+				cls.code_lines = []
+				for code_line in code_lines:
+					code_line = code_line.replace ('\n', '\\n')
+					cls.code_lines.append (code_line)
 			cls.previous_procedure_id = cls.current_procedure_id
 			cls.current_procedure_id = cls.debug_data.get ('current_procedure_id')
 			cls.current_line_id = cls.debug_data.get ('current_line_id')
@@ -61,9 +65,9 @@ class DebugDataProvider ():
 			i = 1
 			for code_line in cls.code_lines:
 				if cls.current_line_id == i:
-					cls.main_window.code_viewer.append ('<b>' + code_line + '</b>')
+					cls.main_window.code_viewer.append ('<span style="font-size:12pt; background-color:#00ff00">' + code_line + '</span>')
 				else:
-					cls.main_window.code_viewer.append (code_line)
+					cls.main_window.code_viewer.append ('<span style="font-size:12pt">' + code_line + '</span>')
 				i += 1
 
 			scrollbar.setValue (scroll)
