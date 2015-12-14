@@ -36,6 +36,7 @@ class DebuggerProvider ():
 
 	@classmethod
 	def set_single_code_line (cls, text):
+		cls.current_procedure_id = 0
 		cls.current_line_id = 1
 		cls.single_code_line = text
 
@@ -54,7 +55,6 @@ class DebuggerProvider ():
 				for line in procedure.code_lines:
 					l.append (line.text)
 			d["code_lines"] = l
-			#print d["code_lines"]
 		cls.data = json.dumps (d, ensure_ascii = False)
 
 	@classmethod

@@ -85,8 +85,11 @@ def main (single_run, use_ctl, use_dbg, text):
         while (code_line != None):
             #print code_line.text
             if DebuggerProvider.use == True:
-                DebuggerProvider.set_procedure_id (code_line.concept_id)
-                DebuggerProvider.set_line_id (code_line.id)
+                if code_line.concept_id != 0 and code_line.id != 0:
+                    DebuggerProvider.set_procedure_id (code_line.concept_id)
+                    DebuggerProvider.set_line_id (code_line.id)
+                else:
+                    DebuggerProvider.set_single_code_line (code_line.text)
                 DebuggerProvider.build_debug_data ()
                 DebuggerProvider.send_data ()
                 DebuggerProvider.receive_data ()

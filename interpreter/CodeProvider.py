@@ -12,6 +12,9 @@ from PropositionTree import PropositionTree
 from MemoryProvider import MemoryProvider
 from TriggerProvider import TriggerProvider
 from ConditionProvider import ConditionProvider
+from DebuggerProvider import DebuggerProvider
+from DebuggerProcedure import DebuggerProcedure
+from DebuggerCodeLine import DebuggerCodeLine
 
 class CodeProvider ():
 
@@ -62,6 +65,9 @@ class CodeProvider ():
 		while (row != None):
 			rows.append (row)
 			row = cls.__cursor.fetchone ()
+		if DebuggerProvider.use == True:
+			dbg_procedure = DebuggerProcedure (list_id, "name_of_procedure")
+			i = 1
 		for row in rows:
 			code_line = CodeLine ()
 			code_line.id = row[0]
@@ -74,6 +80,14 @@ class CodeProvider ():
 			cls.__procedures[index].append (code_line)
 			cls.__procedures_keys[concept_id] = index
 			
+			if DebuggerProvider.use == True:
+				dbg_code_line = DebuggerCodeLine ()
+				dbg_code_line.internal_id = i
+				dbg_code_line.external_id = code_line.id
+				dbg_code_line.text = code_line.text
+				dbg_procedure.append_line (dbg_code_line)
+				i += 1
+
 			# Раскрытие вложенных суждений
 			node = code_line.tree.root_node
 			if 1!=1: #node.text == "создавать":
@@ -203,6 +217,8 @@ class CodeProvider ():
 					node = code_line.tree.pop_node ()
 					k -= 1
 
+		if DebuggerProvider.use == True:
+			DebuggerProvider.register_procedure (dbg_procedure)
 		cls.__handler_variables.append (handler_variables)
 
 	@classmethod
