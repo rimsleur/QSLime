@@ -49,6 +49,8 @@ class SemanticAnalyzer ():
             if code_line.concept_id != 0:
                 if code_line.concept_id == CodeProvider.get_initial_procedure ():
                     database_list = DatabaseList.read_single (self.__cursor, code_line.concept_id, code_line.id)
+                    while database_list != None and database_list.text[:1] == '#':
+                        database_list = DatabaseList.read_single (self.__cursor, list_concept_id, database_list.id)
                     if database_list != None:
                         code_line = CodeLine ()
                         code_line.id = database_list.id
@@ -207,6 +209,8 @@ class SemanticAnalyzer ():
                         self.__error_text = ErrorHelper.get_text (106)
                         return False
                     database_list = DatabaseList.read_single (self.__cursor, list_concept_id, 0)
+                    while database_list != None and database_list.text[:1] == '#':
+                        database_list = DatabaseList.read_single (self.__cursor, list_concept_id, database_list.id)
                     if database_list == None:
                         self.__error_text = ErrorHelper.get_text (106)
                         return False

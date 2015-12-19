@@ -69,41 +69,148 @@ class CodeProvider ():
 			dbg_procedure = DebuggerProcedure (list_id, "name_of_procedure")
 			i = 1
 		for row in rows:
-			code_line = CodeLine ()
-			code_line.id = row[0]
-			code_line.concept_id = list_id
-			code_line.prev_line_id = row[1]
-			code_line.text = row[2]
-			SyntaxAnalyzer.analize (code_line.text)
-			code_line.tree = SyntaxAnalyzer.proposition_tree
-			#PropositionTree.print_tree (code_line.tree)
-			cls.__procedures[index].append (code_line)
-			cls.__procedures_keys[concept_id] = index
+			is_comment = False
+			if row[2][:1] == '#':
+				is_comment = True
+
+			if is_comment == False:
+				code_line = CodeLine ()
+				code_line.id = row[0]
+				code_line.concept_id = list_id
+				code_line.prev_line_id = row[1]
+				code_line.text = row[2]
+				SyntaxAnalyzer.analize (code_line.text)
+				code_line.tree = SyntaxAnalyzer.proposition_tree
+				#PropositionTree.print_tree (code_line.tree)
+				cls.__procedures[index].append (code_line)
+				cls.__procedures_keys[concept_id] = index
 			
 			if DebuggerProvider.use == True:
 				dbg_code_line = DebuggerCodeLine ()
 				dbg_code_line.internal_id = i
-				dbg_code_line.external_id = code_line.id
-				dbg_code_line.text = code_line.text
+				dbg_code_line.external_id = row[0]
+				dbg_code_line.text = row[2]
 				dbg_procedure.append_line (dbg_code_line)
 				i += 1
 
-			# Раскрытие вложенных суждений
-			node = code_line.tree.root_node
-			if 1!=1: #node.text == "создавать":
+			if is_comment == False:
+				# Раскрытие вложенных суждений
+				node = code_line.tree.root_node
+				if 1!=1: #node.text == "создавать":
+					node.child_index = 0
+					side = None
+					error_text = ""
+					k = 0
+					while node != None:
+						if node.child_index == 0:
+							if node.type == PropositionTreeNodeType.concept:
+								if node.concept.subroot == True:
+									child, error_text = PropositionTree.replace_subtree (node, side, True, cls.__cursor)
+									if child != None:
+										parent.children[0] = child
+							else:
+								side = node.side
+						if node.child_index < len (node.children):
+							idx = node.child_index
+							node.child_index += 1
+							code_line.tree.push_node (node)
+							parent = node
+							node = node.children[idx]
+							node.child_index = 0
+							k += 1
+						else:
+							node = code_line.tree.pop_node ()
+							k -= 1
+
+				#PropositionTree.print_tree (code_line.tree)
+				#continue
+
+				#Поиск всех переменных в коде
+				node = code_line.tree.root_node
 				node.child_index = 0
-				side = None
-				error_text = ""
+				field_id = None
+				list1_id = None
+				element1_id = None
 				k = 0
+				parent = None
 				while node != None:
 					if node.child_index == 0:
 						if node.type == PropositionTreeNodeType.concept:
-							if node.concept.subroot == True:
-								child, error_text = PropositionTree.replace_subtree (node, side, True, cls.__cursor)
-								if child != None:
-									parent.children[0] = child
-						else:
-							side = node.side
+							if node.concept.type == TreeNodeConceptType.field or \
+							   node.concept.type == TreeNodeConceptType.element:
+							   pass
+							elif node.concept.type == TreeNodeConceptType.definition:
+								field_id = MemoryProvider.get_field_id (node.concept.name)
+								s = ""
+								if field_id != None:
+									#print parent.text, node.concept.name, field_id
+									node1 = node.parent 
+									while node1 != None:
+										if s != "":
+											s = node1.text + '_' + s
+										else:
+											s = node1.text
+										node1 = node1.parent
+								else:
+									list1_id = MemoryProvider.get_list_id (node.concept.name)
+									if list1_id != None:
+										#print parent.text, node.concept.name, list1_id
+										node1 = node.parent 
+										while node1 != None:
+											#print node1.text
+											if node1.text == "элемент":
+												i = 0
+												node2 = node1.children[i]
+												while node2 != None and node2.text != "?какой":
+													node2 = node1.children[i]
+													i += 1
+												if node2 != None and node2.text == "?какой":
+													node2 = node2.children[0]
+													if node2.type == PropositionTreeNodeType.number:
+														element1_id = int (node2.text)
+											if s != "":
+												s = node1.text + '_' + s
+											else:
+												s = node1.text
+											node1 = node1.parent	
+								if s != "":
+									i = None
+									vi = 0
+									for v in handler_variables.variables:
+										if field_id != None:
+											if v[:1] == 'F':
+												if int (v[1:]) == field_id:
+													i = vi
+													break
+										elif list1_id != None:
+											if v[:1] == 'L':
+												n = v.find ('.')
+												if n != 0:
+													if int (v[1:n]) == list1_id:
+														i = vi
+														break
+										vi += 1
+									if i == None:
+										if field_id != None:
+											object_key = 'F' + str (field_id)
+											handler_variables.variables.append (object_key)
+										elif list1_id != None:
+											object_key = 'L' + str (list1_id) + '.' + str (element1_id)
+											handler_variables.variables.append (object_key)
+										if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3 \
+										or s == cls.TEMPL4 or s == cls.TEMPL5:
+											#print s
+											handler_variables.changeable.append (True)
+										else:
+											#print s
+											handler_variables.changeable.append (False)
+									else:
+										if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3 \
+										or s == cls.TEMPL4 or s == cls.TEMPL5:
+											#print s
+											if handler_variables.changeable[i] == False:
+												handler_variables.changeable[i] = True
+
 					if node.child_index < len (node.children):
 						idx = node.child_index
 						node.child_index += 1
@@ -115,107 +222,6 @@ class CodeProvider ():
 					else:
 						node = code_line.tree.pop_node ()
 						k -= 1
-
-			#PropositionTree.print_tree (code_line.tree)
-			#continue
-
-			#Поиск всех переменных в коде
-			node = code_line.tree.root_node
-			node.child_index = 0
-			field_id = None
-			list1_id = None
-			element1_id = None
-			k = 0
-			parent = None
-			while node != None:
-				if node.child_index == 0:
-					if node.type == PropositionTreeNodeType.concept:
-						if node.concept.type == TreeNodeConceptType.field or \
-						   node.concept.type == TreeNodeConceptType.element:
-						   pass
-						elif node.concept.type == TreeNodeConceptType.definition:
-							field_id = MemoryProvider.get_field_id (node.concept.name)
-							s = ""
-							if field_id != None:
-								#print parent.text, node.concept.name, field_id
-								node1 = node.parent 
-								while node1 != None:
-									if s != "":
-										s = node1.text + '_' + s
-									else:
-										s = node1.text
-									node1 = node1.parent
-							else:
-								list1_id = MemoryProvider.get_list_id (node.concept.name)
-								if list1_id != None:
-									#print parent.text, node.concept.name, list1_id
-									node1 = node.parent 
-									while node1 != None:
-										#print node1.text
-										if node1.text == "элемент":
-											i = 0
-											node2 = node1.children[i]
-											while node2 != None and node2.text != "?какой":
-												node2 = node1.children[i]
-												i += 1
-											if node2 != None and node2.text == "?какой":
-												node2 = node2.children[0]
-												if node2.type == PropositionTreeNodeType.number:
-													element1_id = int (node2.text)
-										if s != "":
-											s = node1.text + '_' + s
-										else:
-											s = node1.text
-										node1 = node1.parent	
-							if s != "":
-								i = None
-								vi = 0
-								for v in handler_variables.variables:
-									if field_id != None:
-										if v[:1] == 'F':
-											if int (v[1:]) == field_id:
-												i = vi
-												break
-									elif list1_id != None:
-										if v[:1] == 'L':
-											n = v.find ('.')
-											if n != 0:
-												if int (v[1:n]) == list1_id:
-													i = vi
-													break
-									vi += 1
-								if i == None:
-									if field_id != None:
-										object_key = 'F' + str (field_id)
-										handler_variables.variables.append (object_key)
-									elif list1_id != None:
-										object_key = 'L' + str (list1_id) + '.' + str (element1_id)
-										handler_variables.variables.append (object_key)
-									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3 \
-									or s == cls.TEMPL4 or s == cls.TEMPL5:
-										#print s
-										handler_variables.changeable.append (True)
-									else:
-										#print s
-										handler_variables.changeable.append (False)
-								else:
-									if s == cls.TEMPL1 or s == cls.TEMPL2 or s == cls.TEMPL3 \
-									or s == cls.TEMPL4 or s == cls.TEMPL5:
-										#print s
-										if handler_variables.changeable[i] == False:
-											handler_variables.changeable[i] = True
-
-				if node.child_index < len (node.children):
-					idx = node.child_index
-					node.child_index += 1
-					code_line.tree.push_node (node)
-					parent = node
-					node = node.children[idx]
-					node.child_index = 0
-					k += 1
-				else:
-					node = code_line.tree.pop_node ()
-					k -= 1
 
 		if DebuggerProvider.use == True:
 			DebuggerProvider.register_procedure (dbg_procedure)

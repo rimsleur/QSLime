@@ -119,9 +119,9 @@ def main ():
 		elif tab_count == 2:
 			line = line [tab_count:]
 
-			if line [:1] == '#':
-				script.write (line)
-				continue
+			#if line [:1] == '#':
+			#	script.write (line)
+			#	continue
 
 			line_count += 1
 			line = line.replace ('\n', '')
