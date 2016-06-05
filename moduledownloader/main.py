@@ -27,6 +27,7 @@ def main ():
 	line_count = 0
 	lines = []
 	procs = []
+	conds = []
 
 	for line in sourse.readlines ():
 		lines.append (line)
@@ -71,13 +72,27 @@ def main ():
 							procedure = line[:m]
 							if procedure != "":
 								procs.append (procedure)
+						elif word == "условие":
+							line = line[m+1:]
+							m = line.find (' ')
+							condition = line[:m]
+							if condition != "":
+								conds.append (condition)
+
+				script.write ('\n')
+				script.write ('./qconcept -c 2 \'' + module + '\'\n')
+				script.write ('./qconcept -c 5\n')
+				script.write ('CONCEPT1=`./qconcept -m`\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем модуль"\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '"\n')
+
 				if len (procs) > 0:
 					script.write ('\n')
-					script.write ('./qconcept -c 2 \'' + module + '\'\n')
+					script.write ('./qconcept -c 2 \'' + module + '.procs' + '\'\n')
 					script.write ('./qconcept -c 5\n')
 					script.write ('CONCEPT1=`./qconcept -m`\n')
-					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем модуль"\n')
-					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '"\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем процедуры"\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '.procs' + '"\n')
 					script.write ('./qconcept -c 7\n')
 					script.write ('CONCEPT2=`./qconcept -m`\n')
 					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT2"\n')
@@ -89,6 +104,26 @@ def main ():
 							script.write ('./qconcept -a $CONCEPT2 0 \'' + module + '.' + proc + '\'; PREVLINE=`./qconcept -g`\n')
 						else:
 							script.write ('./qconcept -a $CONCEPT2 $PREVLINE \'' + module + '.' + proc + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
+						line_count += 1
+
+				if len (conds) > 0:
+					script.write ('\n')
+					script.write ('./qconcept -c 2 \'' + module + '.conds' + '\'\n')
+					script.write ('./qconcept -c 5\n')
+					script.write ('CONCEPT1=`./qconcept -m`\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем условия"\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '.conds' + '"\n')
+					script.write ('./qconcept -c 7\n')
+					script.write ('CONCEPT2=`./qconcept -m`\n')
+					script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT2"\n')
+
+					line_count = 1
+
+					for cond in conds:
+						if line_count == 1:
+							script.write ('./qconcept -a $CONCEPT2 0 \'' + module + '.' + cond + '\'; PREVLINE=`./qconcept -g`\n')
+						else:
+							script.write ('./qconcept -a $CONCEPT2 $PREVLINE \'' + module + '.' + cond + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
 						line_count += 1
 
 		elif tab_count == 1:
@@ -116,12 +151,38 @@ def main ():
 
 				line_count = 0
 
+			elif word == "условие":
+				line = line[m+1:]
+				m = line.find (' ')
+				condition = line[:m]
+
+				script.write ('\n')
+				script.write ('./qconcept -c 2 \'' + module + '.' + condition + '\'\n')
+				script.write ('./qconcept -c 5\n')
+				script.write ('CONCEPT1=`./qconcept -m`\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем условие"\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '.' + condition + '"\n')
+				script.write ('./qconcept -c 7\n')
+				script.write ('CONCEPT2=`./qconcept -m`\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT2"\n')
+
+				script.write ('./qconcept -c 2 \'' + module + '.' + condition + '.precs' + '\'\n')
+				script.write ('./qconcept -c 5\n')
+				script.write ('CONCEPT1=`./qconcept -m`\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем предпосылки"\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что иметь ?что имя ?какой ' + module + '.' + condition + '.precs' + '"\n')
+				script.write ('./qconcept -c 7\n')
+				script.write ('CONCEPT3=`./qconcept -m`\n')
+				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT3"\n')
+
+				line_count = 0
+
 		elif tab_count == 2:
 			line = line [tab_count:]
 
-			#if line [:1] == '#':
-			#	script.write (line)
-			#	continue
+			if line == "(\n" or line == ")\n":
+				line_count = 0
+				continue
 
 			line_count += 1
 			line = line.replace ('\n', '')
@@ -130,6 +191,17 @@ def main ():
 				script.write ('./qconcept -a $CONCEPT2 0 \'' + line + '\'; PREVLINE=`./qconcept -g`\n')
 			else:
 				script.write ('./qconcept -a $CONCEPT2 $PREVLINE \'' + line + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
+
+		elif tab_count == 3:
+			line = line [tab_count:]
+
+			line_count += 1
+			line = line.replace ('\n', '')
+
+			if line_count == 1:
+				script.write ('./qconcept -a $CONCEPT3 0 \'' + line + '\'; PREVLINE=`./qconcept -g`\n')
+			else:
+				script.write ('./qconcept -a $CONCEPT3 $PREVLINE \'' + line + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
 
 	sourse.close
 	script.close
