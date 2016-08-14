@@ -279,6 +279,8 @@ class CodeProvider ():
 		for hv in cls.__handler_variables:
 			#print "hv", hv.id
 			vi = 0
+			if hv == None:
+				continue
 			for v in hv.variables:
 				#print "v", v, hv.changeable[vi]
 				id = variables_ids.get (v)

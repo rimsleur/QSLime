@@ -269,7 +269,7 @@ class SemanticAnalyzer ():
                         if database_list == None:
                             self.__error_text = ErrorHelper.get_text (106)
                             return False
-                        CodeProvider.load_procedure (actant.concept.id, database_list.concept_id)
+                        CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, None)
                     CodeProvider.execute_procedure (actant.concept.id)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-set"):
