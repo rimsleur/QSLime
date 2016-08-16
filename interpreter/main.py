@@ -146,6 +146,9 @@ for arg in sys.argv:
     argi += 1
     if arg == "-1":
         single_run = True
+    elif arg == "-s":
+        #Стандартный запуск
+        pass
     elif arg == "-c":
         use_ctl = True
     elif arg == "-d":
