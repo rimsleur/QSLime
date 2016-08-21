@@ -15,6 +15,7 @@ INSERT INTO `qsl_concept` (`id`, `type`, `name`, `timestamp`) VALUES
 (NULL, 1, 'печатать', NULL),
 (NULL, 1, 'удалять', NULL),
 (NULL, 1, 'преобразовывать', NULL),
+(NULL, 1, 'находить', NULL),
 (NULL, 2, 'ты', NULL),
 (NULL, 2, 'имя', NULL),
 (NULL, 2, 'значение', NULL),
@@ -35,5 +36,6 @@ INSERT INTO `qsl_concept` (`id`, `type`, `name`, `timestamp`) VALUES
 (NULL, 2, 'изменение', NULL),
 (NULL, 2, 'число', NULL),
 (NULL, 2, 'символ', NULL),
-(NULL, 2, 'буква', NULL);
+(NULL, 2, 'буква', NULL),
+(NULL, 2, 'класс', NULL);
 ALTER TABLE qsl_concept AUTO_INCREMENT=100;

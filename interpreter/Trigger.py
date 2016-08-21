@@ -12,3 +12,4 @@ class Trigger ():
 		self.priority = 1
 		self.active = False
 		self.type = 0
+		self.classtxt = ""

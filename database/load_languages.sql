@@ -42,4 +42,6 @@ INSERT INTO `qsl_language` (`en_word`, `lang`, `word`) VALUES
 ('into-what', 'RU', 'во-что'),
 ('number', 'RU', 'число'),
 ('character', 'RU', 'символ'),
-('letter', 'RU', 'буква');
+('letter', 'RU', 'буква'),
+('class', 'RU', 'класс'),
+('to-find', 'RU', 'находить' );

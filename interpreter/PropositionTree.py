@@ -7,6 +7,7 @@ from PropositionTreeNode import PropositionTreeNode
 from PropositionTreeNodeType import PropositionTreeNodeType
 from PropositionTreeNodeSide import PropositionTreeNodeSide
 from LanguageHelper import LanguageHelper
+from TriggerProvider import TriggerProvider
 from ContextProvider import ContextProvider
 from TreeNodeConcept import TreeNodeConcept
 from DatabaseTriad import DatabaseTriad
@@ -160,6 +161,18 @@ class PropositionTree ():
 									result_node.concept.type = TreeNodeConceptType.memlist
 									result_node.concept.name = "$" + str (result_node.concept.id)
 									result_node.text = result_node.concept.name
+				elif actor.concept.name == LanguageHelper.translate ("trigger"):
+					child1 = actant.children[0]
+					if child1.type == PropositionTreeNodeType.linkage:
+						if child1.linkage.name == LanguageHelper.translate ("which"):
+							child2 = child1.children[0]
+							if child2.type == PropositionTreeNodeType.code_object:
+								if is_new == True:
+									result_node.concept.id = TriggerProvider.create_trigger (child2.text)
+									result_node.concept.type = TreeNodeConceptType.trigger
+									result_node.concept.name = "$" + str (result_node.concept.id)
+									result_node.text = result_node.concept.name
+									ContextProvider.set_trigger_node (result_node)
 				elif actor.concept.name == LanguageHelper.translate ("condition"):
 					child1 = actant.children[0]
 					if child1.type == PropositionTreeNodeType.linkage:

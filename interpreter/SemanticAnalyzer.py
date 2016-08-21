@@ -384,6 +384,7 @@ class SemanticAnalyzer ():
                     elif constant_id != 0:
                         if new_value != None:
                             MemoryProvider.set_constant_value (constant_id, new_value)
+                
                 elif actant.concept.name == LanguageHelper.translate ("handler"):
                     handler_variables = HandlerVariables ()
                     trigger_id = 0
@@ -535,6 +536,28 @@ class SemanticAnalyzer ():
                             ConditionProvider.set_priority (condition_id, priority)
                         elif trigger_id != 0:
                             TriggerProvider.set_priority (trigger_id, priority)
+
+                elif actant.concept.name == LanguageHelper.translate ("class"):
+                    trigger_id = 0
+                    trigger_class = ""
+                    i = 0
+                    while i < len (actant.children):
+                        child = actant.children[i]
+                        if child.type == PropositionTreeNodeType.linkage:
+                            if child.linkage.name == LanguageHelper.translate ("of-what"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.concept:
+                                    if child.concept.name == LanguageHelper.translate ("trigger"):
+                                        node = ContextProvider.get_trigger_node ()
+                                        if node != None:
+                                            trigger_id = node.concept.id
+                            elif child.linkage.name == LanguageHelper.translate ("which"):
+                                child = child.children[0]
+                                if child.type == PropositionTreeNodeType.string:
+                                    trigger_class = child.text
+                        i += 1
+                    if trigger_id != 0 and trigger_class != "":
+                            TriggerProvider.set_class (trigger_id, trigger_class)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-use"):
                 if actant.concept.name == LanguageHelper.translate ("element"):
@@ -1018,15 +1041,10 @@ class SemanticAnalyzer ():
                     elif list_id != 0 and element_id != 0:
                         object_key = 'L' + str (list_id) + '.' + str (element_id)
                     if object_key != None:
-                        node = PropositionTreeNode ()
-                        node.type = PropositionTreeNodeType.concept
-                        node.side = child.side
-                        node.concept = TreeNodeConcept ()
-                        node.concept.id = TriggerProvider.register_trigger (object_key, trigger_type, trigger_condition, field_value)
-                        node.concept.type = TreeNodeConceptType.trigger
-                        node.concept.name = "$" + str (node.concept.id)
-                        node.text = node.concept.name
-                        ContextProvider.set_trigger_node (node)
+                        node = ContextProvider.get_trigger_node ()
+                        if node != None:
+                            trigger_id = node.concept.id
+                            TriggerProvider.register_trigger (trigger_id, object_key, trigger_type, trigger_condition, field_value)
 
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-delete"):
                 if actant.concept.name == LanguageHelper.translate ("trigger"):

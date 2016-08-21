@@ -49,7 +49,7 @@
 				<key>comment</key>
 				<string>Понятие действия</string>
 				<key>match</key>
-				<string>\w*(ать|ять|еть)\b</string>
+				<string>\w*(ать|ять|еть|ить)\b</string>
 				<key>name</key>
 				<string>concept.action</string>
 			</dict>

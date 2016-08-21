@@ -15,7 +15,7 @@ class TriggerProvider ():
 	def __init__ (cls):
 		cls.__triggers = []
 		cls.__triggers.append (None)
-		#cls.__trigger_keys = {}
+		cls.__trigger_name_dict = {}
 		cls.__object_triggers = {}
 		
 		cls.__activated_triggers = []
@@ -23,27 +23,32 @@ class TriggerProvider ():
 		#cls.__last_activated_key = ""
 
 	@classmethod
-	def register_trigger (cls, object_key, trigger_type, trigger_condition, field_value):
+	def create_trigger (cls, name):
 		trigger = Trigger ()
+		cls.__triggers.append (trigger)
+		id = len (cls.__triggers) - 1
+		if name != None:
+			cls.__trigger_name_dict[name] = id
+		return id
+
+	@classmethod
+	def register_trigger (cls, trigger_id, object_key, trigger_type, trigger_condition, field_value):
+		trigger = cls.__triggers[trigger_id]
 		#trigger.field_id = field_id
 		trigger.object_key = object_key
 		trigger.type = trigger_type
 		trigger.condition = trigger_condition
 		trigger.value = field_value
-		cls.__triggers.append (trigger)
-		id = len (cls.__triggers) - 1
 
-		#print "trigger_id=", id, " object_key=", object_key, " condition=", trigger_condition, " value", field_value
+		#print "trigger_id=", trigger_id, " object_key=", object_key, " condition=", trigger_condition, " value", field_value
 
 		object_triggers = cls.get_object_triggers (object_key)
 		if object_triggers == None:
 			triggers = []
-			triggers.append (id)
+			triggers.append (trigger_id)
 			cls.__object_triggers [object_key] = triggers
 		else:
-			object_triggers.append (id)
-
-		return id
+			object_triggers.append (trigger_id)
 
 	@classmethod
 	def delete_trigger (cls, object_key, trigger_condition, field_value):
@@ -71,6 +76,11 @@ class TriggerProvider ():
 	def set_priority (cls, id, priority):
 		#print id, priority
 		cls.__triggers[id].priority = priority
+
+	@classmethod
+	def set_class (cls, id, classtxt):
+		#print id, classtxt
+		cls.__triggers[id].classtxt = classtxt
 
 	#@classmethod
 	#def get_trigger_id (cls, key):

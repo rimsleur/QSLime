@@ -100,9 +100,9 @@ def main (single_run, use_ctl, use_dbg, text):
             else:
                 tree = code_line.tree
             if analized:
-                #tree.print_tree ()
+                #tree.print_tree (tree)
                 if semantic_analyzer.analize (tree, code_line):
-                    #tree.print_tree ()
+                    #tree.print_tree (tree)
                     if code_line.tree != None:
                         if code_line.tree.is_totally_parsed == False:
                             code_line.tree = semantic_analyzer.proposition_tree
