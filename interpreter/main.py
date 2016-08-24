@@ -83,7 +83,7 @@ def main (single_run, use_ctl, use_dbg, text):
     while (exit != True):
         code_line = CodeStack.pop ()
         while (code_line != None):
-            #print code_line.text
+            print code_line.text
             if DebuggerProvider.use == True:
                 if code_line.concept_id != 0 and code_line.id != 0:
                     DebuggerProvider.set_procedure_id (code_line.concept_id)

@@ -101,6 +101,8 @@ class SemanticAnalyzer ():
                 k -= 1
 
         actor, actant = PropositionTree.get_actor_and_actant (self.proposition_tree.root_node)
+        #self.proposition_tree.print_tree (self.proposition_tree)
+
         if actor == None:
             return False
 
@@ -453,7 +455,7 @@ class SemanticAnalyzer ():
                                 node = tree.pop_node ()
                                 k -= 1
                         actor, actant = PropositionTree.get_actor_and_actant (tree.root_node)
-                        #tree.print_tree ()
+                        #tree.print_tree (tree)
                     if actor == None:
                         return False
                     if CodeProvider.is_procedure_already_loaded (actant.concept.id) == False:
@@ -1183,6 +1185,10 @@ class SemanticAnalyzer ():
                         from_value -= 1
                         new_value = uppercase [from_value]
                         MemoryProvider.set_field_value (into_field_id, new_value)
+
+            elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-find"):
+                if actant.concept.type == TreeNodeConceptType.trigger:
+                    ContextProvider.set_trigger_node (actant)
 
             else:
                 pass

@@ -82,6 +82,15 @@ class TriggerProvider ():
 		#print id, classtxt
 		cls.__triggers[id].classtxt = classtxt
 
+	@classmethod
+	def get_id_by_class (cls, classtxt):
+		#print classtxt
+		i = 0
+		for trigger in cls.__triggers:
+			if	trigger != None and trigger.classtxt == classtxt:
+				return i
+			i += 1
+
 	#@classmethod
 	#def get_trigger_id (cls, key):
 	#	return cls.__trigger_keys.get (key)

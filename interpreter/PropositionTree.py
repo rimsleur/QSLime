@@ -232,6 +232,18 @@ class PropositionTree ():
 								else:
 									error_text = ErrorHelper.get_text (105)
 									return None, error_text
+			elif actant.concept.name == LanguageHelper.translate ("class"):
+				if actor.concept.name == LanguageHelper.translate ("trigger"):
+					child1 = actant.children[0]
+					if child1.type == PropositionTreeNodeType.linkage:
+						if child1.linkage.name == LanguageHelper.translate ("which"):
+							child2 = child1.children[0]
+							if child2.type == PropositionTreeNodeType.string:
+								result_node.concept.id = TriggerProvider.get_id_by_class (child2.text)
+								result_node.concept.type = TreeNodeConceptType.trigger
+								result_node.concept.name = "$" + str (result_node.concept.id)
+								result_node.text = result_node.concept.name
+								is_memobject = True
 		if is_memobject != True:
 			if result_node.concept.id != 0:
 				database_concept = DatabaseConcept.read_by_id (cursor, result_node.concept.id)
