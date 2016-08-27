@@ -4,4 +4,4 @@
 
 gnome-terminal --window --working-directory="/home/amarch/DATA/Projects/quadoadviser/git/QSLime/bin" -e "./qslime-trm" &
 
-./../../interpreter/main.py -s "ты ?кто выполнять ?что (=процедура ?что иметь ?что имя ?какой Snake.Init)."
+./../../interpreter/main.py -s "ты ?кто загружать ?что (=модуль ?что иметь ?что имя ?какой Snake)."

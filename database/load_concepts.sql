@@ -16,6 +16,7 @@ INSERT INTO `qsl_concept` (`id`, `type`, `name`, `timestamp`) VALUES
 (NULL, 1, 'удалять', NULL),
 (NULL, 1, 'преобразовывать', NULL),
 (NULL, 1, 'находить', NULL),
+(NULL, 1, 'загружать', NULL),
 (NULL, 2, 'ты', NULL),
 (NULL, 2, 'имя', NULL),
 (NULL, 2, 'значение', NULL),

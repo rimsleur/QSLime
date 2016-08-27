@@ -17,3 +17,4 @@ class TreeNodeConceptType ():
     memlist = 11
     element = 12
     constant = 13
+    module = 14

@@ -104,7 +104,17 @@ class PropositionTree ():
 
 		if root_node.concept.name == LanguageHelper.translate ("to-have"):
 			if actant.concept.name == LanguageHelper.translate ("name"):
-				if actor.concept.name == LanguageHelper.translate ("field"):
+				if actor.concept.name == LanguageHelper.translate ("module"):
+					child1 = actant.children[0]
+					if child1.type == PropositionTreeNodeType.linkage:
+						if child1.linkage.name == LanguageHelper.translate ("which"):
+							child2 = child1.children[0]
+							if child2.type == PropositionTreeNodeType.concept:
+								result_node.concept.type = TreeNodeConceptType.module
+								result_node.concept.name = child2.concept.name
+								result_node.text = result_node.concept.name
+								is_memobject = True
+				elif actor.concept.name == LanguageHelper.translate ("field"):
 					child1 = actant.children[0]
 					if child1.type == PropositionTreeNodeType.linkage:
 						if child1.linkage.name == LanguageHelper.translate ("which"):
@@ -123,7 +133,7 @@ class PropositionTree ():
 									result_node.concept.type = TreeNodeConceptType.field
 									result_node.concept.name = "$" + str (result_node.concept.id)
 									result_node.text = result_node.concept.name
-				if actor.concept.name == LanguageHelper.translate ("constant"):
+				elif actor.concept.name == LanguageHelper.translate ("constant"):
 					child1 = actant.children[0]
 					if child1.type == PropositionTreeNodeType.linkage:
 						if child1.linkage.name == LanguageHelper.translate ("which"):

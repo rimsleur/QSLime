@@ -64,6 +64,7 @@ def main (single_run, use_ctl, use_dbg, text):
                 os.write (ctlout, semantic_analyzer.get_error_text () + '\n')
     else:
         if text != "":
+            #print text
             if DebuggerProvider.use == True:
                 DebuggerProvider.reset ()
                 DebuggerProvider.set_single_code_line (text)
@@ -71,7 +72,7 @@ def main (single_run, use_ctl, use_dbg, text):
                 DebuggerProvider.send_data ()
                 DebuggerProvider.receive_data ()
             if SyntaxAnalyzer.analize (text):
-                #syntax_analyzer.proposition_tree.print_tree ()
+                #SyntaxAnalyzer.proposition_tree.print_tree (SyntaxAnalyzer.proposition_tree)
                 if semantic_analyzer.analize (SyntaxAnalyzer.proposition_tree, None):
                     #semantic_analyzer.proposition_tree.print_tree ()
                     result += semantic_analyzer.result
@@ -83,7 +84,7 @@ def main (single_run, use_ctl, use_dbg, text):
     while (exit != True):
         code_line = CodeStack.pop ()
         while (code_line != None):
-            print code_line.text
+            #print code_line.text
             if DebuggerProvider.use == True:
                 if code_line.concept_id != 0 and code_line.id != 0:
                     DebuggerProvider.set_procedure_id (code_line.concept_id)

@@ -275,6 +275,21 @@ class SemanticAnalyzer ():
                         CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, None)
                     CodeProvider.execute_procedure (actant.concept.id)
 
+            elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-load"):
+                if code_line == None:
+                    code_line = CodeLine ()
+                    code_line.text = "выполнять ?что (=процедура ?что иметь ?что имя ?какой Snake.Initialize)."
+                    CodeStack.push (code_line)
+                    CodeStack.inside_procedure = False
+
+                    # Загрузка условий
+
+                    code_line = CodeLine ()
+                    code_line.text = "выполнять ?что (=процедура ?что иметь ?что имя ?какой Snake.Define)."
+                    CodeStack.push (code_line)
+                    CodeStack.inside_procedure = False
+                    return True
+
             elif self.proposition_tree.root_node.concept.name == LanguageHelper.translate ("to-set"):
                 if actant.concept.name == LanguageHelper.translate ("value"):
                     field_id = 0
