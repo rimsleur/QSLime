@@ -280,9 +280,129 @@ class SemanticAnalyzer ():
                     code_line = CodeLine ()
                     code_line.text = "выполнять ?что (=процедура ?что иметь ?что имя ?какой Snake.Initialize)."
                     CodeStack.push (code_line)
-                    CodeStack.inside_procedure = False
 
                     # Загрузка условий
+                    database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("name"))
+                    database_concept2 = DatabaseConcept.read_by_name (self.__cursor, "Snake.conds")
+                    database_triad = DatabaseTriad.read (self.__cursor, database_concept1.id, 0, database_concept2.id)
+                    query = "SELECT left_triad_id, proposition_id FROM qsl_sequence WHERE right_triad_id = " + str (database_triad.id) + ";"
+                    self.__cursor.execute (query)
+                    row = self.__cursor.fetchone ()
+                    query = "SELECT left_triad_id FROM qsl_sequence WHERE right_triad_id = " + str (row[0]) + " AND proposition_id = " + str (row[1]) + ";"
+                    self.__cursor.execute (query)
+                    row = self.__cursor.fetchone ()
+                    database_triad = DatabaseTriad.read_by_id (self.__cursor, row[0])
+                    database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
+                    database_triad = DatabaseTriad.read (self.__cursor, database_triad.left_concept_id, 0, database_concept1.id)
+                    query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                    self.__cursor.execute (query)
+                    row = self.__cursor.fetchone ()
+                    rows = []
+                    list_concept_id = 0
+                    while (row != None):
+                        rows.append (row[0])
+                        row = self.__cursor.fetchone ()
+                    for row in rows:
+                        database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                        if database_triad == None:
+                            continue
+                        database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                        if database_concept == None:
+                            continue
+                        if database_concept.type != TreeNodeConceptType.dblist:
+                            continue
+                        list_concept_id = database_concept.id
+                    if list_concept_id == 0:
+                        return False
+                    database_list = DatabaseList.read_single (self.__cursor, list_concept_id, 0)
+                    while database_list != None:
+                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("name"))
+                        database_concept2 = DatabaseConcept.read_by_name (self.__cursor, database_list.text + ".precs")
+                        database_triad = DatabaseTriad.read (self.__cursor, database_concept1.id, 0, database_concept2.id)
+                        query = "SELECT left_triad_id, proposition_id FROM qsl_sequence WHERE right_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        query = "SELECT left_triad_id FROM qsl_sequence WHERE right_triad_id = " + str (row[0]) + " AND proposition_id = " + str (row[1]) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        database_triad = DatabaseTriad.read_by_id (self.__cursor, row[0])
+                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
+                        database_triad = DatabaseTriad.read (self.__cursor, database_triad.left_concept_id, 0, database_concept1.id)
+                        query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        rows = []
+                        list_concept_id = 0
+                        while (row != None):
+                            rows.append (row[0])
+                            row = self.__cursor.fetchone ()
+                        for row in rows:
+                            database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                            if database_triad == None:
+                                continue
+                            database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                            if database_concept == None:
+                                continue
+                            if database_concept.type != TreeNodeConceptType.dblist:
+                                continue
+                            list_concept_id1 = database_concept.id
+                        if list_concept_id1 == 0:
+                            return False
+                        database_list1 = DatabaseList.read_single (self.__cursor, list_concept_id1, 0)
+                        while database_list1 != None:
+                            if database_list1.text[:1] != '#':
+                                code_line = CodeLine ()
+                                code_line.text = "присоединять (?что триггер, ?к-чему %C6)."
+                                CodeStack.push (code_line)
+                                code_line = CodeLine ()
+                                code_line.text = 'находить ?что (=триггер ?что иметь ?что класс ?какой "' + database_list1.text + '").'
+                                CodeStack.push (code_line)
+                            database_list1 = DatabaseList.read_single (self.__cursor, list_concept_id1, database_list1.id)
+
+                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("name"))
+                        database_concept2 = DatabaseConcept.read_by_name (self.__cursor, database_list.text)
+                        database_triad = DatabaseTriad.read (self.__cursor, database_concept1.id, 0, database_concept2.id)
+                        query = "SELECT left_triad_id, proposition_id FROM qsl_sequence WHERE right_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        query = "SELECT left_triad_id FROM qsl_sequence WHERE right_triad_id = " + str (row[0]) + " AND proposition_id = " + str (row[1]) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        database_triad = DatabaseTriad.read_by_id (self.__cursor, row[0])
+                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
+                        database_triad = DatabaseTriad.read (self.__cursor, database_triad.left_concept_id, 0, database_concept1.id)
+                        query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        rows = []
+                        list_concept_id = 0
+                        while (row != None):
+                            rows.append (row[0])
+                            row = self.__cursor.fetchone ()
+                        for row in rows:
+                            database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
+                            if database_triad == None:
+                                continue
+                            database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
+                            if database_concept == None:
+                                continue
+                            if database_concept.type != TreeNodeConceptType.dblist:
+                                continue
+                            list_concept_id2 = database_concept.id
+                        if list_concept_id2 == 0:
+                            return False
+                        database_list2 = DatabaseList.read_single (self.__cursor, list_concept_id2, 0)
+                        while database_list2 != None:
+                            if database_list2.text[:1] != '#':
+                                code_line = CodeLine ()
+                                code_line.text = 'устанавливать ?что обработчик (?чего условие, ?какой "' + database_list2.text + '").'
+                                CodeStack.push (code_line)
+                                code_line = CodeLine ()
+                                code_line.text = "создавать ?что (=условие ?что иметь ?что имя ?какой %C6)."
+                                CodeStack.push (code_line)
+                            database_list2 = DatabaseList.read_single (self.__cursor, list_concept_id2, database_list2.id)
+
+                        database_list = DatabaseList.read_single (self.__cursor, list_concept_id, database_list.id)
 
                     code_line = CodeLine ()
                     code_line.text = "выполнять ?что (=процедура ?что иметь ?что имя ?какой Snake.Define)."
