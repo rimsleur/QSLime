@@ -352,7 +352,7 @@ class SemanticAnalyzer ():
                         while database_list1 != None:
                             if database_list1.text[:1] != '#':
                                 code_line = CodeLine ()
-                                code_line.text = "присоединять (?что триггер, ?к-чему %C6)."
+                                code_line.text = "присоединять (?что триггер, ?к-чему " + database_list.text + ")."
                                 CodeStack.push (code_line)
                                 code_line = CodeLine ()
                                 code_line.text = 'находить ?что (=триггер ?что иметь ?что класс ?какой "' + database_list1.text + '").'
@@ -396,9 +396,10 @@ class SemanticAnalyzer ():
                             if database_list2.text[:1] != '#':
                                 code_line = CodeLine ()
                                 code_line.text = 'устанавливать ?что обработчик (?чего условие, ?какой "' + database_list2.text + '").'
+                                print code_line.text
                                 CodeStack.push (code_line)
                                 code_line = CodeLine ()
-                                code_line.text = "создавать ?что (=условие ?что иметь ?что имя ?какой %C6)."
+                                code_line.text = "создавать ?что (=условие ?что иметь ?что имя ?какой " + database_list.text + ")."
                                 CodeStack.push (code_line)
                             database_list2 = DatabaseList.read_single (self.__cursor, list_concept_id2, database_list2.id)
 

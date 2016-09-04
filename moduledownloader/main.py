@@ -28,6 +28,8 @@ def main ():
 	lines = []
 	procs = []
 	conds = []
+	inside_round_brackets = False
+	inside_curved_brackets = False
 
 	for line in sourse.readlines ():
 		lines.append (line)
@@ -176,32 +178,41 @@ def main ():
 				script.write ('./qsl2qsl -c "#$CONCEPT1 ?что быть ?чем #$CONCEPT3"\n')
 
 				line_count = 0
+			else:
+				word = line [tab_count:]	
+
+				if word == "(\n":
+					inside_round_brackets = True
+					line_count = 0
+					continue
+				elif word == ")\n":
+					inside_round_brackets = False
+					continue
+				elif word == "{\n":
+					inside_curved_brackets = True
+					line_count = 0
+					continue
+				elif word == "}\n":
+					inside_curved_brackets = False
+					continue
 
 		elif tab_count == 2:
 			line = line [tab_count:]
 
-			if line == "(\n" or line == ")\n":
-				line_count = 0
-				continue
-
 			line_count += 1
 			line = line.replace ('\n', '')
 
-			if line_count == 1:
-				script.write ('./qconcept -a $CONCEPT2 0 \'' + line + '\'; PREVLINE=`./qconcept -g`\n')
-			else:
-				script.write ('./qconcept -a $CONCEPT2 $PREVLINE \'' + line + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
+			if inside_round_brackets == True:
+				if line_count == 1:
+					script.write ('./qconcept -a $CONCEPT3 0 \'' + line + '\'; PREVLINE=`./qconcept -g`\n')
+				else:
+					script.write ('./qconcept -a $CONCEPT3 $PREVLINE \'' + line + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
 
-		elif tab_count == 3:
-			line = line [tab_count:]
-
-			line_count += 1
-			line = line.replace ('\n', '')
-
-			if line_count == 1:
-				script.write ('./qconcept -a $CONCEPT3 0 \'' + line + '\'; PREVLINE=`./qconcept -g`\n')
-			else:
-				script.write ('./qconcept -a $CONCEPT3 $PREVLINE \'' + line + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
+			if inside_curved_brackets == True:
+				if line_count == 1:
+					script.write ('./qconcept -a $CONCEPT2 0 \'' + line + '\'; PREVLINE=`./qconcept -g`\n')
+				else:
+					script.write ('./qconcept -a $CONCEPT2 $PREVLINE \'' + line + '\'; PREVLINE=`echo "$PREVLINE + 1" | bc`\n')
 
 	sourse.close
 	script.close
