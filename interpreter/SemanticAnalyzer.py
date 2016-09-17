@@ -396,12 +396,15 @@ class SemanticAnalyzer ():
                             if database_list2.text[:1] != '#':
                                 code_line = CodeLine ()
                                 code_line.text = 'устанавливать ?что обработчик (?чего условие, ?какой "' + database_list2.text + '").'
-                                print code_line.text
+                                #print code_line.text
                                 CodeStack.push (code_line)
-                                code_line = CodeLine ()
-                                code_line.text = "создавать ?что (=условие ?что иметь ?что имя ?какой " + database_list.text + ")."
-                                CodeStack.push (code_line)
+                                #CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, handler_variables)
+
                             database_list2 = DatabaseList.read_single (self.__cursor, list_concept_id2, database_list2.id)
+
+                        code_line = CodeLine ()
+                        code_line.text = "создавать ?что (=условие ?что иметь ?что имя ?какой " + database_list.text + ")."
+                        CodeStack.push (code_line)
 
                         database_list = DatabaseList.read_single (self.__cursor, list_concept_id, database_list.id)
 
@@ -663,7 +666,7 @@ class SemanticAnalyzer ():
                                         if node != None:
                                             condition_id = node.concept.id
                                     else:
-                                        field_id = child.concept.id
+                                        condition_id = ConditionProvider.get_condition_id (child.concept.name)
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
                                 if child.type == PropositionTreeNodeType.number:
