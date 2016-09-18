@@ -31,8 +31,8 @@ class ConditionProvider ():
 		return cls.__condition_name_dict.get (name)
 
 	@classmethod
-	def set_handler (cls, id, handler):
-		cls.__conditions[id].handler = handler
+	def set_handler (cls, id, concept_id):
+		cls.__conditions[id].handler = concept_id
 		cls.__conditions[id].priority = 4
 
 	@classmethod
@@ -85,9 +85,10 @@ class ConditionProvider ():
 		if len (cls.__activated_conditions) > 0:
 			condition = cls.__activated_conditions.pop ()
 		while condition != None:
-			if condition.handler != "":
+			if condition.handler != 0:
 				code_line = CodeLine ()
-				code_line.text = condition.handler
+				code_line.concept_id = condition.handler
+				code_line.prev_line_id = -1
 				code_line.priority = condition.priority
 				CodeStack.push (code_line)
 			condition = None

@@ -84,42 +84,46 @@ def main (single_run, use_ctl, use_dbg, text):
     while (exit != True):
         code_line = CodeStack.pop ()
         while (code_line != None):
-            #print code_line.text
-            if DebuggerProvider.use == True:
-                if code_line.concept_id != 0 and code_line.id != 0:
-                    DebuggerProvider.set_procedure_id (code_line.concept_id)
-                    DebuggerProvider.set_line_id (code_line.id)
+            if code_line.text != "":
+                #print code_line.text
+                if DebuggerProvider.use == True:
+                    if code_line.concept_id != 0 and code_line.id != 0:
+                        DebuggerProvider.set_procedure_id (code_line.concept_id)
+                        DebuggerProvider.set_line_id (code_line.id)
+                    else:
+                        DebuggerProvider.set_single_code_line (code_line.text)
+                    DebuggerProvider.build_debug_data ()
+                    DebuggerProvider.send_data ()
+                    DebuggerProvider.receive_data ()
+                analized = True
+                if code_line.tree == None:
+                    analized = SyntaxAnalyzer.analize (code_line.text)
+                    tree = SyntaxAnalyzer.proposition_tree
                 else:
-                    DebuggerProvider.set_single_code_line (code_line.text)
-                DebuggerProvider.build_debug_data ()
-                DebuggerProvider.send_data ()
-                DebuggerProvider.receive_data ()
-            analized = True
-            if code_line.tree == None:
-                analized = SyntaxAnalyzer.analize (code_line.text)
-                tree = SyntaxAnalyzer.proposition_tree
-            else:
-                tree = code_line.tree
-            if analized:
-                #tree.print_tree (tree)
-                if semantic_analyzer.analize (tree, code_line):
+                    tree = code_line.tree
+                if analized:
                     #tree.print_tree (tree)
-                    if code_line.tree != None:
-                        if code_line.tree.is_totally_parsed == False:
-                            code_line.tree = semantic_analyzer.proposition_tree
-                            code_line.tree.is_totally_parsed = True
-                    result += semantic_analyzer.result
+                    if semantic_analyzer.analize (tree, code_line):
+                        #tree.print_tree (tree)
+                        if code_line.tree != None:
+                            if code_line.tree.is_totally_parsed == False:
+                                code_line.tree = semantic_analyzer.proposition_tree
+                                code_line.tree.is_totally_parsed = True
+                        result += semantic_analyzer.result
+                    else:
+                        return semantic_analyzer.get_error_text ()
                 else:
-                    return semantic_analyzer.get_error_text ()
+                    return SyntaxAnalyzer.get_error_text ()
+                if CodeStack.is_empty () == True:
+                    if CodeStack.inside_procedure == False:
+                        if CodeProvider.is_priorities_assigned () == False:
+                            CodeProvider.assign_priorities ()
+                        TriggerProvider.dispatch_triggers ()
+                        ConditionProvider.dispatch_conditions ()
+                        CodeStack.sort ()
             else:
-                return SyntaxAnalyzer.get_error_text ()
-            if CodeStack.is_empty () == True:
-                if CodeStack.inside_procedure == False:
-                    if CodeProvider.is_priorities_assigned () == False:
-                        CodeProvider.assign_priorities ()
-                    TriggerProvider.dispatch_triggers ()
-                    ConditionProvider.dispatch_conditions ()
-                    CodeStack.sort ()
+                if code_line.prev_line_id == -1 and code_line.concept_id != 0:
+                    CodeProvider.execute_procedure (code_line.concept_id)
             code_line = CodeStack.pop ()
 
             if result != "" and single_run == False:

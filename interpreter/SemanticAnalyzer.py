@@ -359,48 +359,9 @@ class SemanticAnalyzer ():
                                 CodeStack.push (code_line)
                             database_list1 = DatabaseList.read_single (self.__cursor, list_concept_id1, database_list1.id)
 
-                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("name"))
-                        database_concept2 = DatabaseConcept.read_by_name (self.__cursor, database_list.text)
-                        database_triad = DatabaseTriad.read (self.__cursor, database_concept1.id, 0, database_concept2.id)
-                        query = "SELECT left_triad_id, proposition_id FROM qsl_sequence WHERE right_triad_id = " + str (database_triad.id) + ";"
-                        self.__cursor.execute (query)
-                        row = self.__cursor.fetchone ()
-                        query = "SELECT left_triad_id FROM qsl_sequence WHERE right_triad_id = " + str (row[0]) + " AND proposition_id = " + str (row[1]) + ";"
-                        self.__cursor.execute (query)
-                        row = self.__cursor.fetchone ()
-                        database_triad = DatabaseTriad.read_by_id (self.__cursor, row[0])
-                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
-                        database_triad = DatabaseTriad.read (self.__cursor, database_triad.left_concept_id, 0, database_concept1.id)
-                        query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
-                        self.__cursor.execute (query)
-                        row = self.__cursor.fetchone ()
-                        rows = []
-                        list_concept_id = 0
-                        while (row != None):
-                            rows.append (row[0])
-                            row = self.__cursor.fetchone ()
-                        for row in rows:
-                            database_triad = DatabaseTriad.read_by_id (self.__cursor, row)
-                            if database_triad == None:
-                                continue
-                            database_concept = DatabaseConcept.read_by_id (self.__cursor, database_triad.right_concept_id)
-                            if database_concept == None:
-                                continue
-                            if database_concept.type != TreeNodeConceptType.dblist:
-                                continue
-                            list_concept_id2 = database_concept.id
-                        if list_concept_id2 == 0:
-                            return False
-                        database_list2 = DatabaseList.read_single (self.__cursor, list_concept_id2, 0)
-                        while database_list2 != None:
-                            if database_list2.text[:1] != '#':
-                                code_line = CodeLine ()
-                                code_line.text = 'устанавливать ?что обработчик (?чего условие, ?какой "' + database_list2.text + '").'
-                                #print code_line.text
-                                CodeStack.push (code_line)
-                                #CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, handler_variables)
-
-                            database_list2 = DatabaseList.read_single (self.__cursor, list_concept_id2, database_list2.id)
+                        code_line = CodeLine ()
+                        code_line.text = 'устанавливать ?что обработчик (?чего условие, ?какой ' + database_list.text + ').'
+                        CodeStack.push (code_line)
 
                         code_line = CodeLine ()
                         code_line.text = "создавать ?что (=условие ?что иметь ?что имя ?какой " + database_list.text + ")."
@@ -530,7 +491,7 @@ class SemanticAnalyzer ():
                     handler_variables = HandlerVariables ()
                     trigger_id = 0
                     condition_id = 0
-                    handler_text = None
+                    concept_id = 0
                     i = 0
                     while i < len (actant.children):
                         child = actant.children[i]
@@ -550,60 +511,27 @@ class SemanticAnalyzer ():
                                         field_id = child.concept.id
                             elif child.linkage.name == LanguageHelper.translate ("which"):
                                 child = child.children[0]
-                                if child.type == PropositionTreeNodeType.string:
-                                    handler_text = child.text
+                                if child.type == PropositionTreeNodeType.concept:
+                                    concept_id = child.concept.id
                         i += 1
-                    #Предварительная загрузка процедур в память
-                    if handler_text != None:
-                        handler_text = handler_text.replace ("\\", "")
-                    actor = None
-                    actant = None
-                    analized = SyntaxAnalyzer.analize (handler_text)
-                    if analized == True:
-                        tree = SyntaxAnalyzer.proposition_tree
-                        # Раскрытие вложенных суждений
-                        node = tree.root_node
-                        node.child_index = 0
-                        side = None
-                        k = 0
-                        while node != None:
-                            if node.child_index == 0:
-                                if node.type == PropositionTreeNodeType.concept:
-                                    if node.concept.subroot == True:
-                                        child = None
-                                        if is_new == True:
-                                            if k == 2:
-                                                child, self.__error_text = PropositionTree.replace_subtree (node, side, is_new, self.__cursor)
-                                            else:
-                                                child, self.__error_text = PropositionTree.replace_subtree (node, side, False, self.__cursor)
-                                        else:
-                                            child, self.__error_text = PropositionTree.replace_subtree (node, side, is_new, self.__cursor)
-                                        if child != None:
-                                            parent.children[0] = child
-                                else:
-                                    side = node.side
-                            if node.child_index < len (node.children):
-                                idx = node.child_index
-                                node.child_index += 1
-                                tree.push_node (node)
-                                parent = node
-                                node = node.children[idx]
-                                node.child_index = 0
-                                k += 1
-                            else:
-                                node = tree.pop_node ()
-                                k -= 1
-                        actor, actant = PropositionTree.get_actor_and_actant (tree.root_node)
-                        #tree.print_tree (tree)
-                    if actor == None:
-                        return False
-                    if CodeProvider.is_procedure_already_loaded (actant.concept.id) == False:
+
+                    if CodeProvider.is_procedure_already_loaded (concept_id) == False:
+                        database_concept1 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("name"))
+                        database_triad = DatabaseTriad.read (self.__cursor, database_concept1.id, 0, concept_id)
+                        query = "SELECT left_triad_id, proposition_id FROM qsl_sequence WHERE right_triad_id = " + str (database_triad.id) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        query = "SELECT left_triad_id FROM qsl_sequence WHERE right_triad_id = " + str (row[0]) + " AND proposition_id = " + str (row[1]) + ";"
+                        self.__cursor.execute (query)
+                        row = self.__cursor.fetchone ()
+                        database_triad = DatabaseTriad.read_by_id (self.__cursor, row[0])
                         list_concept_id = 0
-                        database_concept = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
-                        if database_concept == None:
+                        database_concept2 = DatabaseConcept.read_by_name (self.__cursor, LanguageHelper.translate ("to-be"))
+                        if database_concept2 == None:
                             self.__error_text = ErrorHelper.get_text (106)
                             return None
-                        database_triad = DatabaseTriad.read (self.__cursor, actant.concept.id, 0, database_concept.id)
+                        concept_id = database_triad.left_concept_id
+                        database_triad = DatabaseTriad.read (self.__cursor, database_triad.left_concept_id, 0, database_concept2.id)
                         if database_triad != None:
                             query = "SELECT right_triad_id FROM qsl_sequence WHERE left_triad_id = " + str (database_triad.id) + ";"
                             self.__cursor.execute (query)
@@ -631,18 +559,18 @@ class SemanticAnalyzer ():
                                 return False
 
                         if trigger_id != 0:
-                            if handler_text != None:
-                                TriggerProvider.set_handler (trigger_id, handler_text)
+                            if concept_id != 0:
+                                TriggerProvider.set_handler (trigger_id, concept_id)
                                 #handler_variables.type = 'T'
                                 handler_variables.id = 'T' + str (trigger_id)
-                                CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, handler_variables)
+                                CodeProvider.load_procedure (concept_id, database_list.concept_id, handler_variables)
                         elif condition_id != 0:
-                            if handler_text != None:
-                                ConditionProvider.set_handler (condition_id, handler_text)
+                            if concept_id != 0:
+                                ConditionProvider.set_handler (condition_id, concept_id)
                                 #handler_variables.type = 'C'
                                 if list_concept_id != 0:
                                     handler_variables.id = 'C' + str (condition_id)
-                                    CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, handler_variables)
+                                    CodeProvider.load_procedure (concept_id, database_list.concept_id, handler_variables)
                         else:
                             CodeProvider.load_procedure (actant.concept.id, database_list.concept_id, None)
 

@@ -8,4 +8,4 @@ class Condition ():
 	def __init__ (self):
 		self.attached_triggers = 0
 		self.activated_triggers = 0
-		self.handler = ""
+		self.handler = 0

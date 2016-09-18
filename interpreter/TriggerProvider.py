@@ -65,8 +65,8 @@ class TriggerProvider ():
 				del (cls.__object_triggers[object_key])
 
 	@classmethod
-	def set_handler (cls, id, handler):
-		cls.__triggers[id].handler = handler
+	def set_handler (cls, id, concept_id):
+		cls.__triggers[id].handler = concept_id
 
 	@classmethod
 	def get_handler (cls, id):
@@ -168,6 +168,7 @@ class TriggerProvider ():
 		for trigger in triggers:
 			code_line = CodeLine ()
 			code_line.field_id = trigger.object_key
-			code_line.text = trigger.handler
+			code_line.concept_id = trigger.handler
+			code_line.prev_line_id = -1
 			code_line.priority = trigger.priority
 			CodeStack.push (code_line)
