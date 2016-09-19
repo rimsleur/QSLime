@@ -229,7 +229,7 @@ class CodeProvider ():
 
 	@classmethod
 	def execute_procedure (cls, concept_id):
-		id = cls.__procedures_keys.get(concept_id)		
+		id = cls.__procedures_keys.get(concept_id)
 		if id != None:
 			if cls.__current_procedure != None:
 				cls.__current_procedures.append (cls.__current_procedure)

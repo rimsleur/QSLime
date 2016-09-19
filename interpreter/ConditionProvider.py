@@ -56,7 +56,6 @@ class ConditionProvider ():
 
 	@classmethod
 	def activate_trigger (cls, trigger_id):
-		#print trigger_id
 		is_set = cls.__is_activated_triggers.get (trigger_id)
 		if is_set == False:
 			cls.__is_activated_triggers[trigger_id] = True
