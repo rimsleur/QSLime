@@ -6,14 +6,24 @@
 		<array>
 			<string>qslm</string>
 		</array>
-		
+
 		<key>patterns</key>
 		<array>
+
 			<dict>
 				<key>comment</key>
 				<string>Комментарий</string>
 				<key>match</key>
-				<string>\#.*\n</string>
+				<string>(\#.*\n|\//.*\n)</string>
+				<key>name</key>
+				<string>comment</string>
+			</dict>
+
+			<dict>
+				<key>begin</key>
+				<string>/\*</string>
+				<key>end</key>
+				<string>\*/</string>
 				<key>name</key>
 				<string>comment</string>
 			</dict>

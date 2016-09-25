@@ -30,12 +30,22 @@ def main ():
 	conds = []
 	inside_round_brackets = False
 	inside_curved_brackets = False
+	inside_comment_block = False
 
 	for line in sourse.readlines ():
 		lines.append (line)
 
 	for line in lines:
 		if line == "\n":
+			continue
+
+		if line == "/*\n":
+			inside_comment_block = True
+			continue
+		elif line == "*/\n":
+			inside_comment_block = False
+			continue
+		elif inside_comment_block == True:
 			continue
 
 		tab_count = 0
@@ -56,6 +66,16 @@ def main ():
 				module = line[:m]
 
 				for line in lines:
+
+					if line == "/*\n":
+						inside_comment_block = True
+						continue
+					elif line == "*/\n":
+						inside_comment_block = False
+						continue
+					elif inside_comment_block == True:
+						continue
+
 					tab_count = 0
 
 					for char in line:
@@ -80,6 +100,8 @@ def main ():
 							condition = line[:m]
 							if condition != "":
 								conds.append (condition)
+
+				inside_comment_block = False
 
 				script.write ('\n')
 				script.write ('./qconcept -c 2 \'' + module + '\'\n')

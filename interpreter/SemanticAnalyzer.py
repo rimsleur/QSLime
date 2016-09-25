@@ -50,7 +50,7 @@ class SemanticAnalyzer ():
                 if code_line.concept_id == CodeProvider.get_initial_procedure ():
                     database_list = DatabaseList.read_single (self.__cursor, code_line.concept_id, code_line.id)
                     list_concept_id = 0
-                    while database_list != None and database_list.text[:1] == '#':
+                    while database_list != None and ( database_list.text[:1] == '#' or database_list.text[:2] == '//'):
                         database_list = DatabaseList.read_single (self.__cursor, list_concept_id, database_list.id)
                     if database_list != None:
                         code_line = CodeLine ()
@@ -212,7 +212,7 @@ class SemanticAnalyzer ():
                         self.__error_text = ErrorHelper.get_text (106)
                         return False
                     database_list = DatabaseList.read_single (self.__cursor, list_concept_id, 0)
-                    while database_list != None and database_list.text[:1] == '#':
+                    while database_list != None and (database_list.text[:1] == '#' or database_list.text[:2] == '//'):
                         database_list = DatabaseList.read_single (self.__cursor, list_concept_id, database_list.id)
                     if database_list == None:
                         self.__error_text = ErrorHelper.get_text (106)
@@ -350,7 +350,7 @@ class SemanticAnalyzer ():
                             return False
                         database_list1 = DatabaseList.read_single (self.__cursor, list_concept_id1, 0)
                         while database_list1 != None:
-                            if database_list1.text[:1] != '#':
+                            if database_list1.text[:1] != '#' and database_list1.text[:2] != '//':
                                 code_line = CodeLine ()
                                 code_line.text = "присоединять (?что триггер, ?к-чему " + database_list.text + ")."
                                 CodeStack.push (code_line)

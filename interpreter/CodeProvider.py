@@ -70,7 +70,7 @@ class CodeProvider ():
 			i = 1
 		for row in rows:
 			is_comment = False
-			if row[2][:1] == '#':
+			if row[2][:1] == '#' or row[2][:2] == '//':
 				is_comment = True
 
 			if is_comment == False:
